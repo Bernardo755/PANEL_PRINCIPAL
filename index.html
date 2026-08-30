@@ -19,7 +19,38 @@
     .app-window { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; background: #f1f5f9; overflow-y: auto; padding: 20px; }
     .app-window.active { display: block; }
 
-    /* Estilos internos adaptados del Optimizador de Cortes */
+   
+  </style>
+</head>
+<body>
+
+  <!-- Barra de Pestañas -->
+  <div class="tab-bar">
+
+    <button class="tab-btn active" onclick="switchTab('tab1', event)">📑 Calculadora de Madera</button>
+    <button class="tab-btn" onclick="switchTab('tab2', event)">🪚 Optimizador de Cortes</button>
+    <button class="tab-btn" onclick="switchTab('tab3', event)">📑 Inventario</button>
+  </div>
+
+  <!-- Contenedor de Aplicaciones -->
+  <div class="window-container">
+    
+    <!-- PESTAÑA 1: Optimizador de Cortes Pro -->
+    <div id="tab2" class="app-window active">
+      <div class="container">
+        <!-- Panel Lateral -->
+        <div class="sidebar">
+          <h2>1. Tablero Principal</h2>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+  <style>
+          
+ /* Estilos internos adaptados del Optimizador de Cortes */
     .container { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; }
     .sidebar { width: 320px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); flex-shrink: 0; }
     h2 { font-size: 16px; margin-bottom: 12px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
@@ -49,27 +80,9 @@
     .piece { position: absolute; color: white; border: 1px solid rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; text-align: center; cursor: move; user-select: none; border-radius: 3px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
     .piece:hover { filter: brightness(1.08); }
     .piece span { pointer-events: none; }
-  </style>
+          </style>
 </head>
 <body>
-
-  <!-- Barra de Pestañas -->
-  <div class="tab-bar">
-
-    <button class="tab-btn active" onclick="switchTab('tab1', event)">📑 Calculadora de Madera</button>
-    <button class="tab-btn" onclick="switchTab('tab2', event)">🪚 Optimizador de Cortes</button>
-    <button class="tab-btn" onclick="switchTab('tab3', event)">📑 Inventario</button>
-  </div>
-
-  <!-- Contenedor de Aplicaciones -->
-  <div class="window-container">
-    
-    <!-- PESTAÑA 1: Optimizador de Cortes Pro -->
-    <div id="tab2" class="app-window active">
-      <div class="container">
-        <!-- Panel Lateral -->
-        <div class="sidebar">
-          <h2>1. Tablero Principal</h2>
           <div class="group row">
             <div>
               <label>Ancho (mm)</label>
