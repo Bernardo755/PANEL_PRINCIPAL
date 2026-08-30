@@ -3,13 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Optimizador de Cortes de Madera Pro</title>
+  <title>Sistema Multi-Herramientas Pro</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f1f5f9; padding: 20px; color: #1e293b; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #e2e8f0; color: #1e293b; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+    /* Barra de Pestañas Superior */
+    .tab-bar { display: flex; background: #0f172a; padding: 10px 20px 0 20px; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 1000; }
+    .tab-btn { background: #1e293b; color: #94a3b8; border: none; padding: 10px 20px; font-size: 14px; font-weight: 600; border-top-left-radius: 8px; border-top-right-radius: 8px; cursor: pointer; transition: all 0.2s; }
+    .tab-btn:hover { background: #334155; color: #f8fafc; }
+    .tab-btn.active { background: #f1f5f9; color: #0f172a; }
+
+    /* Contenedor de las Ventanas */
+    .window-container { flex-grow: 1; position: relative; overflow: hidden; }
+    .app-window { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; background: #f1f5f9; overflow-y: auto; padding: 20px; }
+    .app-window.active { display: block; }
+
+    /* Estilos internos adaptados del Optimizador de Cortes */
     .container { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; }
-    
-    /* Panel lateral */
     .sidebar { width: 320px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); flex-shrink: 0; }
     h2 { font-size: 16px; margin-bottom: 12px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
     .group { margin-bottom: 12px; }
@@ -17,31 +28,24 @@
     input { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
     input:focus { outline: none; border-color: #2563eb; }
     .row { display: flex; gap: 10px; }
-    button { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    button:hover { background: #1d4ed8; }
+    button.action-btn { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    button.action-btn:hover { background: #1d4ed8; }
     button.clear { background: #ef4444; margin-top: 8px; }
     button.clear:hover { background: #dc2626; }
     
-    /* Panel Resumen Lateral */
     .summary-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-top: 15px; }
     .summary-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: #334155; }
     
-    /* Área Principal */
     .main-area { flex-grow: 1; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
     .instructions { font-size: 13px; color: #64748b; margin-bottom: 15px; background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 4px solid #2563eb; }
     
-    #board-container { width: 100%; height: 650px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1; overflow: hidden; position: relative; }
-    
-    /* Indicador Visual de Medidas en el Canvas */
+    .board-container { width: 100%; height: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1; overflow: hidden; position: relative; }
     .canvas-overlay { position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.85); color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; z-index: 10; pointer-events: none; }
     .canvas-overlay strong { color: #38bdf8; }
 
-    #board { background: #e2e8f0; border: 2px solid #94a3b8; position: relative; transform-origin: center; }
-    
-    /* Caja delimitadora del área utilizada */
-    #bounding-box-guide { position: absolute; border: 2px dashed #f59e0b; background: rgba(245, 158, 11, 0.08); pointer-events: none; display: none; }
+    .board { background: #e2e8f0; border: 2px solid #94a3b8; position: relative; transform-origin: center; }
+    .bounding-box-guide { position: absolute; border: 2px dashed #f59e0b; background: rgba(245, 158, 11, 0.08); pointer-events: none; display: none; }
 
-    /* Piezas arrastrables */
     .piece { position: absolute; color: white; border: 1px solid rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; text-align: center; cursor: move; user-select: none; border-radius: 3px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
     .piece:hover { filter: brightness(1.08); }
     .piece span { pointer-events: none; }
@@ -49,88 +53,733 @@
 </head>
 <body>
 
-<div class="container">
-  <!-- Panel Lateral -->
-  <div class="sidebar">
-    <h2>1. Tablero Principal</h2>
-    <div class="group row">
-      <div>
-        <label>Ancho (mm)</label>
-        <input type="number" id="board-w" value="2440" oninput="updateBoard()">
-      </div>
-      <div>
-        <label>Alto (mm)</label>
-        <input type="number" id="board-h" value="1220" oninput="updateBoard()">
-      </div>
-    </div>
+  <!-- Barra de Pestañas -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('tab1', event)">🪚 Optimizador de Cortes</button>
+    <button class="tab-btn" onclick="switchTab('tab2', event)">📑 Ventana Anterior / Extra</button>
+  </div>
+
+  <!-- Contenedor de Aplicaciones -->
+  <div class="window-container">
     
-    <div class="group">
-      <label>Grosor del disco / Margen (mm)</label>
-      <input type="number" id="kerf" value="3" oninput="updateBoard()">
+    <!-- PESTAÑA 1: Optimizador de Cortes Pro -->
+    <div id="tab1" class="app-window active">
+      <div class="container">
+        <!-- Panel Lateral -->
+        <div class="sidebar">
+          <h2>1. Tablero Principal</h2>
+          <div class="group row">
+            <div>
+              <label>Ancho (mm)</label>
+              <input type="number" id="board-w" value="2440" oninput="updateBoard()">
+            </div>
+            <div>
+              <label>Alto (mm)</label>
+              <input type="number" id="board-h" value="1220" oninput="updateBoard()">
+            </div>
+          </div>
+          
+          <div class="group">
+            <label>Grosor del disco / Margen (mm)</label>
+            <input type="number" id="kerf" value="3" oninput="updateBoard()">
+          </div>
+
+          <h2>2. Agregar Piezas</h2>
+          <div class="group">
+            <label>Etiqueta / Nombre</label>
+            <input type="text" id="piece-name" placeholder="Ej: Estante">
+          </div>
+          <div class="group row">
+            <div>
+              <label>Ancho (mm)</label>
+              <input type="number" id="piece-w" value="600">
+            </div>
+            <div>
+              <label>Alto (mm)</label>
+              <input type="number" id="piece-h" value="400">
+            </div>
+          </div>
+          <div class="group">
+            <label>Cantidad</label>
+            <input type="number" id="piece-qty" value="1" min="1">
+          </div>
+          <button class="action-btn" onclick="addPieces()">+ Agregar Piezas</button>
+          <button class="action-btn clear" onclick="clearPieces()">Limpiar Piezas</button>
+
+          <h2>3. Resumen</h2>
+          <div class="summary-card">
+            <div class="summary-item">
+              <span>Piezas totales:</span>
+              <strong id="stat-count">0</strong>
+            </div>
+            <div class="summary-item">
+              <span>Área neta piezas:</span>
+              <strong id="stat-area-pieces">0.00 m²</strong>
+            </div>
+            <div class="summary-item">
+              <span>Aprovechamiento:</span>
+              <strong id="stat-usage">0%</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área de Trabajo -->
+        <div class="main-area">
+          <div class="instructions">
+            💡 <strong>Novedad:</strong> Las piezas cambian de color por paquete y <strong>no se pueden encimar</strong> respetando el margen de corte. Revisa las medidas del área usada arriba a la izquierda.
+          </div>
+          <div class="board-container" id="board-container">
+            <div class="canvas-overlay">
+              📏 Tablero Base: <strong id="overlay-board-dim">0 x 0 mm</strong> | 
+              ✂️ Placa Utilizada: <strong id="overlay-used-dim">0 x 0 mm</strong>
+            </div>
+            <div class="board" id="board">
+              <div class="bounding-box-guide" id="bounding-box-guide"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <h2>2. Agregar Piezas</h2>
-    <div class="group">
-      <label>Etiqueta / Nombre</label>
-      <input type="text" id="piece-name" placeholder="Ej: Estante">
-    </div>
-    <div class="group row">
-      <div>
-        <label>Ancho (mm)</label>
-        <input type="number" id="piece-w" value="600">
-      </div>
-      <div>
-        <label>Alto (mm)</label>
-        <input type="number" id="piece-h" value="400">
-      </div>
-    </div>
-    <div class="group">
-      <label>Cantidad</label>
-      <input type="number" id="piece-qty" value="1" min="1">
-    </div>
-    <button onclick="addPieces()">+ Agregar Piezas</button>
-    <button class="clear" onclick="clearPieces()">Limpiar Piezas</button>
+    <!-- PESTAÑA 2: Aquí puedes colocar tu otro código -->
+    <div id="tab2" class="app-window">
+      <div class="main-area" style="max-width: 800px; margin: 0 auto;">
+        <h2>Ventana Secundaria</h2>
+        <div class="instructions" style="margin-top: 15px;">
+         <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Maderera Pro (Multimedidas Independientes)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-4 md:p-8 pb-20">
 
-    <h2>3. Resumen</h2>
-    <div class="summary-card">
-      <div class="summary-item">
-        <span>Piezas totales:</span>
-        <strong id="stat-count">0</strong>
+  <div class="max-w-6xl mx-auto space-y-6">
+    
+    <header class="bg-amber-800 text-white p-6 rounded-xl shadow-lg flex flex-wrap justify-between items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold">🪵 Calculadora de Madera Pro</h1>
+        <p class="text-amber-200 text-sm">Cálculo de pies con soporte multimetría y análisis de muebles</p>
       </div>
-      <div class="summary-item">
-        <span>Área neta piezas:</span>
-        <strong id="stat-area-pieces">0.00 m²</strong>
+      <div class="flex gap-2">
+        <!-- BOTÓN NUEVO: CONVERSOR -->
+        <button onclick="abrirConversor()" class="bg-teal-700 hover:bg-teal-600 px-4 py-2 rounded-lg text-sm font-semibold transition border border-teal-500 shadow-md">
+          🧮 Conversor
+        </button>
+        <button onclick="consultarHistorial()" class="bg-amber-700 hover:bg-amber-600 px-4 py-2 rounded-lg text-sm font-semibold transition border border-amber-500 shadow-md">
+          📋 Consultar y Editar
+        </button>
       </div>
-      <div class="summary-item">
-        <span>Aprovechamiento:</span>
-        <strong id="stat-usage">0%</strong>
+    </header>
+
+    <main class="bg-white rounded-xl shadow-md p-6 space-y-6">
+      
+      <!-- Indicador de Edición -->
+      <div id="badge-edicion" class="hidden bg-indigo-100 text-indigo-800 p-3 rounded-lg flex justify-between items-center border border-indigo-200">
+        <div><span class="font-bold">Modo Edición:</span> Estás editando un cálculo guardado previamente.</div>
+        <button onclick="limpiarFormulario()" class="text-indigo-600 hover:text-indigo-900 font-bold text-sm">Cancelar Edición</button>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Título o Referencia del Proyecto *</label>
+        <input type="text" id="titulo" placeholder="Ej: Pedido Cliente Perez - Comedor" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+
+      <!-- Tabla de Medidas de Madera -->
+      <div class="overflow-x-auto border border-slate-200 rounded-lg">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-100 border-b text-xs uppercase text-slate-500 font-semibold">
+              <th class="p-3 text-center w-10">#</th>
+              <th class="p-3">Largo</th>
+              <th class="p-3">Ancho</th>
+              <th class="p-3">Grosor</th>
+              <th class="p-3 text-center w-24">Cantidad</th>
+              <th class="p-3 text-center">Pies/Tabla</th>
+              <th class="p-3 text-center">Subtotal PT</th>
+              <th class="p-3 text-center">X</th>
+            </tr>
+          </thead>
+          <tbody id="filas-madera" class="divide-y divide-slate-100 text-sm"></tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-between items-center border-t pt-4">
+        <button onclick="agregarFila()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg transition shadow-sm flex items-center gap-1">
+          ➕ Agregar Tabla
+        </button>
+        <div class="bg-amber-50 border border-amber-200 rounded-lg px-6 py-2 flex items-center gap-4 text-amber-900 shadow-inner">
+          <span class="font-semibold">Total:</span>
+          <span id="total-general" class="text-2xl font-extrabold">0.00 PT</span>
+        </div>
+      </div>
+
+      <!-- SECCIÓN: ANÁLISIS DE MUEBLE -->
+      <div class="mt-8 border-t-2 border-slate-100 pt-6">
+        <h2 class="text-xl font-bold text-slate-700 mb-2 flex items-center gap-2">🪑 Análisis de Fabricación de Muebles</h2>
+        <p class="text-sm text-slate-500 mb-6">Agrega los grosores (en pulgadas) y pies (PT) que requiere tu mueble. Se cruzará con tu inventario superior.</p>
+        
+        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del Mueble / Producto</label>
+            <input type="text" id="mueble-nombre" placeholder="Ej: Silla de Comedor" class="w-full border border-slate-300 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" oninput="calcularMueble()">
+          </div>
+
+          <div class="overflow-x-auto border border-blue-200 rounded-lg bg-white">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-blue-50 text-xs uppercase text-blue-800 font-semibold border-b border-blue-200">
+                  <th class="p-3">Grosor Requerido (Pulgadas)</th>
+                  <th class="p-3">Pies (PT) por Mueble</th>
+                  <th class="p-3 text-center w-20">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="filas-req-mueble" class="divide-y divide-slate-100 text-sm"></tbody>
+            </table>
+          </div>
+          
+          <button onclick="agregarFilaMueble()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition shadow-sm">
+            ➕ Agregar Grosor / Componente
+          </button>
+        </div>
+
+        <div id="resultado-mueble" class="hidden mt-4 p-5 rounded-lg text-sm shadow-inner transition-all"></div>
+      </div>
+
+      <!-- BOTONES FINALES -->
+      <div class="flex justify-end gap-4 pt-6 mt-4 border-t border-slate-200">
+        <button onclick="limpiarFormulario()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-6 py-3 rounded-lg transition">🧹 Limpiar Todo</button>
+        <button onclick="guardarEnSheets()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold px-8 py-3 rounded-lg transition shadow-lg text-lg flex items-center gap-2">
+          💾 Guardar Proyecto
+        </button>
+      </div>
+
+    </main>
+
+    <!-- MODAL DE CONSULTA HISTORIAL -->
+    <div id="modal-historial" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+      <div class="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="p-4 bg-slate-800 text-white flex justify-between items-center">
+          <h2 class="text-lg font-bold">📋 Proyectos Guardados</h2>
+          <button onclick="cerrarHistorial()" class="text-slate-400 hover:text-white font-bold text-2xl">&times;</button>
+        </div>
+        <div class="p-4 overflow-y-auto flex-1">
+          <div id="loading-historial" class="text-center py-8 text-slate-500 font-medium">Cargando base de datos...</div>
+          <table id="tabla-historial" class="hidden w-full text-sm text-left border-collapse">
+            <thead class="bg-slate-100 text-slate-600 sticky top-0 shadow-sm">
+              <tr id="headers-historial"></tr>
+            </thead>
+            <tbody id="body-historial" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
       </div>
     </div>
+
+    <!-- MODAL NUEVO: CONVERSOR Y CALCULADORA DE FRACCIONES -->
+    <div id="modal-conversor" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+      <div class="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+        <div class="p-4 bg-teal-800 text-white flex justify-between items-center">
+          <h2 class="text-lg font-bold">🧮 Conversor de Medidas</h2>
+          <button onclick="cerrarConversor()" class="text-teal-200 hover:text-white font-bold text-2xl">&times;</button>
+        </div>
+        <div class="p-6 space-y-6">
+          <p class="text-sm text-slate-500">Ingresa una medida en decimal o fracción (ej. <span class="font-mono bg-slate-100 px-1">1 1/2</span> o <span class="font-mono bg-slate-100 px-1">3/4</span>) y selecciona la unidad.</p>
+          
+          <div class="flex gap-2">
+            <input type="text" id="conv-input" placeholder="Ej: 1 1/2" class="w-full border border-slate-300 rounded-lg p-3 text-lg text-center outline-none focus:ring-2 focus:ring-teal-500" oninput="convertirValores()">
+            <select id="conv-unidad" class="border border-slate-300 rounded-lg p-3 bg-white outline-none focus:ring-2 focus:ring-teal-500 font-semibold" onchange="convertirValores()">
+              <option value="in">Pulgadas (in)</option>
+              <option value="cm">Centímetros (cm)</option>
+              <option value="ft">Pies (ft)</option>
+            </select>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
+            <div class="flex justify-between items-center border-b pb-2 border-slate-200">
+              <span class="text-slate-500 font-medium">En Pulgadas:</span>
+              <span id="res-in" class="font-bold text-lg text-slate-800">0.000 in</span>
+            </div>
+            <div class="flex justify-between items-center border-b pb-2 border-slate-200">
+              <span class="text-slate-500 font-medium">En Centímetros:</span>
+              <span id="res-cm" class="font-bold text-lg text-slate-800">0.00 cm</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-medium">En Pies:</span>
+              <span id="res-ft" class="font-bold text-lg text-slate-800">0.000 ft</span>
+            </div>
+          </div>
+          
+          <button onclick="cerrarConversor()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-lg transition">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Área de Trabajo -->
-  <div class="main-area">
-    <div class="instructions">
-      💡 <strong>Novedad:</strong> Las piezas cambian de color por paquete y <strong>no se pueden encimar</strong> respetando el margen de corte. Revisa las medidas del área usada arriba a la izquierda.
-    </div>
-    <div id="board-container">
-      <div class="canvas-overlay">
-        📏 Tablero Base: <strong id="overlay-board-dim">0 x 0 mm</strong> | 
-        ✂️ Placa Utilizada: <strong id="overlay-used-dim">0 x 0 mm</strong>
+  <script>
+    // === ⚠️ REEMPLAZA ESTA URL CON TU SCRIPT EXISTENTE ⚠️ ===
+    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyBMWLc_Q4dV6PG_VudNf9BT_17i4CEebdJKyfx6q9A5u6dr3vpTcsXRBBnkfHLnjQLZg/exec";
+
+    let proyectoActualId = null;
+    let infoMuebleGuardar = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      agregarFila(); 
+      agregarFilaMueble(); 
+    });
+
+    // Convierte texto/fracciones a decimal
+    function procesarFraccion(valor) {
+      if (!valor) return 0;
+      valor = valor.toString().trim();
+      if (!isNaN(valor)) return parseFloat(valor) || 0;
+
+      const mixedMatch = valor.match(/^(\d+)[ \-](.+)$/);
+      if (mixedMatch) {
+        const entero = parseFloat(mixedMatch[1]);
+        const fraccionPartes = mixedMatch[2].split('/');
+        if (fraccionPartes.length === 2) return entero + (parseFloat(fraccionPartes[0]) / parseFloat(fraccionPartes[1]));
+      }
+      if (valor.includes('/')) {
+        const partes = valor.split('/');
+        if (partes.length === 2) return parseFloat(partes[0]) / parseFloat(partes[1]);
+      }
+      return 0; 
+    }
+
+    // =====================================
+    // LÓGICA DEL CONVERSOR (NUEVO)
+    // =====================================
+    function abrirConversor() {
+      document.getElementById("modal-conversor").classList.remove("hidden");
+      document.getElementById("conv-input").focus();
+    }
+    
+    function cerrarConversor() {
+      document.getElementById("modal-conversor").classList.add("hidden");
+    }
+
+    function convertirValores() {
+      const inputVal = document.getElementById("conv-input").value;
+      const unidad = document.getElementById("conv-unidad").value;
+      const valDec = procesarFraccion(inputVal);
+
+      if (valDec === 0) {
+        document.getElementById("res-in").textContent = "0.000 in";
+        document.getElementById("res-cm").textContent = "0.00 cm";
+        document.getElementById("res-ft").textContent = "0.000 ft";
+        return;
+      }
+
+      let inVal = 0, cmVal = 0, ftVal = 0;
+
+      if (unidad === 'in') {
+        inVal = valDec;
+        cmVal = valDec * 2.54;
+        ftVal = valDec / 12;
+      } else if (unidad === 'cm') {
+        cmVal = valDec;
+        inVal = valDec / 2.54;
+        ftVal = valDec / 30.48;
+      } else if (unidad === 'ft') {
+        ftVal = valDec;
+        inVal = valDec * 12;
+        cmVal = valDec * 30.48;
+      }
+
+      document.getElementById("res-in").textContent = inVal.toFixed(3) + " in";
+      document.getElementById("res-cm").textContent = cmVal.toFixed(2) + " cm";
+      document.getElementById("res-ft").textContent = ftVal.toFixed(3) + " ft";
+    }
+
+
+    // =====================================
+    // LÓGICA DE TABLAS / INVENTARIO DE MADERA
+    // =====================================
+    function agregarFila(datos = null) {
+      const tbody = document.getElementById("filas-madera");
+      const tr = document.createElement("tr");
+      
+      // Valores por defecto de las unidades si no hay datos guardados
+      const uLargo = datos ? datos.uLargo : 'ft';
+      const uAncho = datos ? datos.uAncho : 'in';
+      const uGrosor = datos ? datos.uGrosor : 'in';
+
+      tr.innerHTML = `
+        <td class="p-2 text-center font-bold text-slate-400 num-fila"></td>
+        
+        <td class="p-2">
+          <div class="flex flex-col sm:flex-row gap-1">
+            <input type="text" class="largo border border-slate-300 rounded p-1.5 w-full sm:w-20 text-center focus:ring-1 focus:ring-amber-500" value="${datos ? datos.largo : ''}" oninput="calcularTotales()">
+            <select class="u-largo text-xs border border-slate-300 bg-slate-50 rounded p-1 outline-none text-slate-600 focus:ring-1 focus:ring-amber-500" onchange="calcularTotales()">
+              <option value="ft" ${uLargo === 'ft' ? 'selected' : ''}>ft</option>
+              <option value="cm" ${uLargo === 'cm' ? 'selected' : ''}>cm</option>
+            </select>
+          </div>
+        </td>
+
+        <td class="p-2">
+          <div class="flex flex-col sm:flex-row gap-1">
+            <input type="text" class="ancho border border-slate-300 rounded p-1.5 w-full sm:w-20 text-center focus:ring-1 focus:ring-amber-500" value="${datos ? datos.ancho : ''}" oninput="calcularTotales()">
+            <select class="u-ancho text-xs border border-slate-300 bg-slate-50 rounded p-1 outline-none text-slate-600 focus:ring-1 focus:ring-amber-500" onchange="calcularTotales()">
+              <option value="in" ${uAncho === 'in' ? 'selected' : ''}>in</option>
+              <option value="cm" ${uAncho === 'cm' ? 'selected' : ''}>cm</option>
+            </select>
+          </div>
+        </td>
+
+        <td class="p-2">
+          <div class="flex flex-col sm:flex-row gap-1">
+            <input type="text" class="grosor border border-slate-300 rounded p-1.5 w-full sm:w-20 text-center focus:ring-1 focus:ring-amber-500" value="${datos ? datos.grosor : ''}" oninput="calcularTotales()">
+            <select class="u-grosor text-xs border border-slate-300 bg-slate-50 rounded p-1 outline-none text-slate-600 focus:ring-1 focus:ring-amber-500" onchange="calcularTotales()">
+              <option value="in" ${uGrosor === 'in' ? 'selected' : ''}>in</option>
+              <option value="cm" ${uGrosor === 'cm' ? 'selected' : ''}>cm</option>
+            </select>
+          </div>
+        </td>
+
+        <td class="p-2"><input type="number" step="1" min="1" class="cantidad border border-slate-300 rounded p-1.5 w-full text-center focus:ring-1 focus:ring-amber-500" value="${datos ? datos.cantidad : '1'}" oninput="calcularTotales()"></td>
+        <td class="p-2 font-medium text-slate-600 pies-unitarios text-center">0.00</td>
+        <td class="p-2 font-bold text-amber-800 pies-subtotal text-center">0.00</td>
+        <td class="p-2 text-center"><button onclick="eliminarFila(this)" class="text-rose-500 font-bold hover:bg-rose-100 px-2 rounded">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+      actualizarNumeracion();
+      if(datos) calcularTotales();
+    }
+
+    function eliminarFila(btn) {
+      if (document.getElementById("filas-madera").children.length > 1) {
+        btn.closest("tr").remove();
+        actualizarNumeracion();
+        calcularTotales();
+      } else alert("Debe existir al menos una tabla.");
+    }
+
+    function actualizarNumeracion() {
+      document.querySelectorAll("#filas-madera tr").forEach((fila, index) => {
+        fila.querySelector(".num-fila").textContent = index + 1;
+      });
+    }
+
+    // CALCULA Y CONVIERTE UNIDADES DESDE CADA FILA
+    function calcularTotales() {
+      let grandTotal = 0;
+      
+      document.querySelectorAll("#filas-madera tr").forEach(fila => {
+        let lVal = procesarFraccion(fila.querySelector(".largo").value);
+        let aVal = procesarFraccion(fila.querySelector(".ancho").value);
+        let gVal = procesarFraccion(fila.querySelector(".grosor").value);
+        const cantidad = parseInt(fila.querySelector(".cantidad").value) || 0;
+
+        // Obtener la unidad seleccionada para esta fila específica
+        const uLargo = fila.querySelector(".u-largo").value;
+        const uAncho = fila.querySelector(".u-ancho").value;
+        const uGrosor = fila.querySelector(".u-grosor").value;
+
+        // Conversiones (La fórmula PT estándar necesita: Pies para Largo, Pulgadas para Ancho y Grosor)
+        let largoFt = (uLargo === 'cm') ? lVal / 30.48 : lVal;
+        let anchoIn = (uAncho === 'cm') ? aVal / 2.54 : aVal;
+        let grosorIn = (uGrosor === 'cm') ? gVal / 2.54 : gVal;
+
+        const piesUnitarios = (grosorIn * anchoIn * largoFt) / 12;
+        const subtotalPies = piesUnitarios * cantidad;
+
+        // Guardamos el grosor en Pulgadas en la fila de forma invisible para que la sección de muebles funcione correctamente siempre.
+        fila.dataset.grosorIn = grosorIn.toFixed(4);
+
+        fila.querySelector(".pies-unitarios").textContent = piesUnitarios.toFixed(2);
+        fila.querySelector(".pies-subtotal").textContent = subtotalPies.toFixed(2);
+        grandTotal += subtotalPies;
+      });
+      
+      document.getElementById("total-general").textContent = grandTotal.toFixed(2) + " PT";
+      calcularMueble(); // Recalcular muebles basados en inventario actualizado
+    }
+
+    // =====================================
+    // LÓGICA DE COMPONENTES DEL MUEBLE
+    // =====================================
+    function agregarFilaMueble(datos = null) {
+      const tbody = document.getElementById("filas-req-mueble");
+      const tr = document.createElement("tr");
+      
+      tr.innerHTML = `
+        <td class="p-2"><input type="text" placeholder="Ej: 1 1/2" class="req-grosor border border-blue-200 rounded p-2 w-full text-center focus:ring-1 focus:ring-blue-500" value="${datos ? datos.grosor : ''}" oninput="calcularMueble()"></td>
+        <td class="p-2"><input type="number" step="0.1" placeholder="Ej: 4.5" class="req-pt border border-blue-200 rounded p-2 w-full text-center focus:ring-1 focus:ring-blue-500" value="${datos ? datos.pt : ''}" oninput="calcularMueble()"></td>
+        <td class="p-2 text-center"><button onclick="eliminarFilaMueble(this)" class="text-rose-500 font-bold px-2 py-1 hover:bg-rose-100 rounded">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+      if(datos) calcularMueble();
+    }
+
+    function eliminarFilaMueble(btn) {
+      btn.closest("tr").remove();
+      calcularMueble();
+    }
+
+    function calcularMueble() {
+      const nombre = document.getElementById("mueble-nombre").value || "Mueble";
+      const divRes = document.getElementById("resultado-mueble");
+      const filasReq = document.querySelectorAll("#filas-req-mueble tr");
+
+      let agrupacionReqs = {}; 
+      let hasReqs = false;
+
+      // 1. Requerimientos
+      filasReq.forEach(fila => {
+        const grosorStr = fila.querySelector(".req-grosor").value;
+        const grosor = procesarFraccion(grosorStr); // Asumimos que los requerimientos del mueble se anotan en pulgadas
+        const pt = parseFloat(fila.querySelector(".req-pt").value) || 0;
+
+        if (grosor > 0 && pt > 0) {
+          hasReqs = true;
+          if (!agrupacionReqs[grosor]) agrupacionReqs[grosor] = { str: grosorStr, ptTotal: 0 };
+          agrupacionReqs[grosor].ptTotal += pt;
+        }
+      });
+
+      if (!hasReqs) {
+        divRes.classList.add("hidden");
+        infoMuebleGuardar = null;
+        return;
+      }
+
+      // 2. Extraer Inventario de Madera (Leemos la variable invisible ya estandarizada en pulgadas)
+      let inventario = [];
+      document.querySelectorAll("#filas-madera tr").forEach(fila => {
+        const grosor = parseFloat(fila.dataset.grosorIn) || 0; 
+        const subtotal = parseFloat(fila.querySelector(".pies-subtotal").textContent);
+        if (grosor > 0 && subtotal > 0) inventario.push({ grosor, subtotal });
+      });
+
+      // 3. Analizar disponibilidad
+      let mueblesPosiblesArray = [];
+      let detalleHTML = `<ul class="list-disc pl-5 space-y-3 mt-4 text-sm text-slate-700">`;
+      let reqGuardar = [];
+
+      for (let gReqNum in agrupacionReqs) {
+        const req = agrupacionReqs[gReqNum];
+        const grosorReq = parseFloat(gReqNum);
+        
+        let ptExacto = 0, ptGrueso = 0, ptDelgado = 0;
+
+        inventario.forEach(inv => {
+          if (Math.abs(inv.grosor - grosorReq) < 0.05) ptExacto += inv.subtotal; 
+          else if (inv.grosor > grosorReq) ptGrueso += inv.subtotal;
+          else if (inv.grosor < grosorReq) ptDelgado += inv.subtotal;
+        });
+
+        const totalUsable = ptExacto + ptGrueso + ptDelgado;
+        const posiblesParaEsteGrosor = Math.floor(totalUsable / req.ptTotal);
+        
+        mueblesPosiblesArray.push(posiblesParaEsteGrosor);
+
+        detalleHTML += `<li>
+          <b>Componentes de ${req.str}" (Req. ${req.ptTotal} PT):</b> Alcanza para <b>${posiblesParaEsteGrosor}</b> mueble(s).
+          <div class="text-xs text-slate-500 mt-1 bg-white/50 p-2 rounded inline-block">
+            Madera disponible: ${ptExacto.toFixed(1)} PT Exactos | ${ptGrueso.toFixed(1)} PT para cepillar | ${ptDelgado.toFixed(1)} PT para laminar.
+          </div>
+        </li>`;
+
+        reqGuardar.push({ grosor: req.str, pt: req.ptTotal, posibles: posiblesParaEsteGrosor });
+      }
+      detalleHTML += `</ul>`;
+
+      const mueblesCompletos = Math.min(...mueblesPosiblesArray);
+
+      divRes.classList.remove("hidden", "bg-emerald-50", "bg-rose-50", "bg-amber-50");
+      let tituloHTML = `<h4 class="font-bold text-lg mb-2 pb-2 border-b border-black/10">
+        Resultado Final: Puedes armar <span class="text-2xl">${mueblesCompletos}</span> ${nombre}(s) completos.
+      </h4>`;
+
+      if (mueblesCompletos > 0) divRes.classList.add("bg-emerald-50", "text-emerald-900", "border", "border-emerald-200");
+      else divRes.classList.add("bg-rose-50", "text-rose-900", "border", "border-rose-200");
+
+      divRes.innerHTML = tituloHTML + detalleHTML;
+
+      infoMuebleGuardar = {
+        nombre: nombre,
+        piezas: mueblesCompletos,
+        requisitos: reqGuardar,
+        notas: `Requiere ${reqGuardar.length} grosores dist.`
+      };
+    }
+
+    // =====================================
+    // GUARDADO Y CONSULTA
+    // =====================================
+    function limpiarFormulario() {
+      proyectoActualId = null;
+      document.getElementById("badge-edicion").classList.add("hidden");
+      document.getElementById("titulo").value = "";
+      document.getElementById("mueble-nombre").value = "";
+      document.getElementById("resultado-mueble").classList.add("hidden");
+      
+      document.getElementById("filas-madera").innerHTML = "";
+      document.getElementById("filas-req-mueble").innerHTML = "";
+      
+      infoMuebleGuardar = null;
+      agregarFila();
+      agregarFilaMueble();
+      calcularTotales();
+    }
+
+    async function guardarEnSheets() {
+      const titulo = document.getElementById("titulo").value.trim();
+      if (!titulo) return alert("Por favor ingresa un título para el proyecto.");
+      
+      const filas = document.querySelectorAll("#filas-madera tr");
+      const items = [];
+
+      filas.forEach(fila => {
+        const largoStr = fila.querySelector(".largo").value;
+        const uLargo = fila.querySelector(".u-largo").value;
+        const anchoStr = fila.querySelector(".ancho").value;
+        const uAncho = fila.querySelector(".u-ancho").value;
+        const grosorStr = fila.querySelector(".grosor").value;
+        const uGrosor = fila.querySelector(".u-grosor").value;
+        const cantidad = parseInt(fila.querySelector(".cantidad").value) || 0;
+        const pt = parseFloat(fila.querySelector(".pies-unitarios").textContent);
+        const spt = parseFloat(fila.querySelector(".pies-subtotal").textContent);
+
+        if (procesarFraccion(largoStr) > 0 && cantidad > 0) {
+          // Ahora guardamos la unidad específica seleccionada de la fila
+          items.push({ 
+            largo: largoStr, uLargo: uLargo, 
+            ancho: anchoStr, uAncho: uAncho, 
+            grosor: grosorStr, uGrosor: uGrosor, 
+            cantidad, piesPorTabla: pt, subtotalPies: spt 
+          });
+        }
+      });
+
+      if (items.length === 0) return alert("Ingresa al menos una medida de madera válida antes de guardar.");
+
+      const payload = {
+        id: proyectoActualId || "PRJ-" + new Date().getTime(),
+        titulo: titulo,
+        totalGeneral: parseFloat(document.getElementById("total-general").textContent),
+        filas: items,
+        mueble: infoMuebleGuardar
+      };
+
+      try {
+        await fetch(URL_APPS_SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        alert("✅ Proyecto Guardado/Actualizado con éxito.");
+        limpiarFormulario();
+      } catch (error) {
+        alert("❌ Error al guardar.");
+      }
+    }
+
+    async function consultarHistorial() {
+      const modal = document.getElementById("modal-historial");
+      const loading = document.getElementById("loading-historial");
+      const tabla = document.getElementById("tabla-historial");
+      
+      modal.classList.remove("hidden");
+      loading.classList.remove("hidden");
+      tabla.classList.add("hidden");
+
+      try {
+        const res = await fetch(URL_APPS_SCRIPT);
+        const data = await res.json();
+        
+        loading.classList.add("hidden");
+        tabla.classList.remove("hidden");
+
+        const hContainer = document.getElementById("headers-historial");
+        const bContainer = document.getElementById("body-historial");
+        hContainer.innerHTML = ""; bContainer.innerHTML = "";
+
+        if (data.data.length === 0) {
+          bContainer.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">No hay proyectos.</td></tr>`;
+          return;
+        }
+
+        data.headers.forEach(h => hContainer.innerHTML += `<th class="p-3">${h}</th>`);
+
+        data.data.forEach(row => {
+          const jsonSeguro = row[5] ? row[5].replace(/'/g, "&#39;") : ""; 
+          let tr = `<tr class="hover:bg-slate-50 border-b border-slate-100">
+            <td class="p-3 font-mono text-xs text-slate-500">${row[0]}</td>
+            <td class="p-3 whitespace-nowrap text-xs">${row[1]}</td>
+            <td class="p-3 font-bold text-slate-700">${row[2]}</td>
+            <td class="p-3 font-bold text-amber-700">${row[3]} PT</td>
+            <td class="p-3 text-xs text-slate-600">${row[4]}</td>
+            <td class="p-3 text-center">
+              <button onclick='cargarProyecto(\`${jsonSeguro}\`)' class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-sm font-medium transition shadow-sm">
+                ✏️ Editar
+              </button>
+            </td>
+          </tr>`;
+          bContainer.innerHTML += tr;
+        });
+      } catch (error) {
+        loading.textContent = "Error al cargar. Revisa tu URL de Apps Script.";
+      }
+    }
+
+    function cargarProyecto(jsonStr) {
+      if(!jsonStr) return alert("Error de lectura de datos.");
+      const data = JSON.parse(jsonStr);
+      
+      proyectoActualId = data.id;
+      document.getElementById("badge-edicion").classList.remove("hidden");
+      document.getElementById("titulo").value = data.titulo;
+
+      document.getElementById("filas-madera").innerHTML = "";
+      // Al iterar sobre filas, el nuevo agregarFila tomará en cuenta los "uLargo", "uAncho" para dejarlos seleccionados
+      data.filas.forEach(f => agregarFila(f));
+
+      document.getElementById("filas-req-mueble").innerHTML = "";
+      if (data.mueble && data.mueble.requisitos && data.mueble.requisitos.length > 0) {
+        document.getElementById("mueble-nombre").value = data.mueble.nombre || "";
+        data.mueble.requisitos.forEach(r => agregarFilaMueble({ grosor: r.grosor, pt: r.pt }));
+      } else {
+        document.getElementById("mueble-nombre").value = "";
+        agregarFilaMueble();
+      }
+
+      calcularTotales(); 
+      cerrarHistorial();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cerrarHistorial() {
+      document.getElementById("modal-historial").classList.add("hidden");
+    }
+  </script>
+</body>
+</html>
+        </div>
       </div>
-      <div id="board">
-        <div id="bounding-box-guide"></div>
-      </div>
     </div>
+
   </div>
-</div>
 
 <script>
+  // Control de Pestañas
+  function switchTab(tabId, event) {
+    document.querySelectorAll('.app-window').forEach(win => win.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+
+    if(tabId === 'tab1') {
+      updateBoard(); // Recalcular escalas al volver a la pestaña del optimizador
+    }
+  }
+
+  // Lógica del Optimizador de Cortes
   let scale = 1;
   let activePiece = null;
   let offsetX = 0, offsetY = 0;
 
-  // Paleta de colores atractivos para los lotes de piezas
   const batchColors = [
     '#2563eb', '#d97706', '#059669', '#7c3aed', '#dc2626', 
     '#0891b2', '#4d7c0f', '#c026d3', '#ea580c', '#4f46e5'
@@ -177,7 +826,7 @@
     if (!pw || !ph || qty < 1) return alert('Por favor ingresa valores válidos.');
 
     const board = document.getElementById('board');
-    const batchColor = getRandomColor(); // Color único para este paquete
+    const batchColor = getRandomColor();
 
     for (let i = 0; i < qty; i++) {
       const piece = document.createElement('div');
@@ -195,7 +844,6 @@
 
       updatePieceSize(piece);
 
-      // Buscar posición libre automáticamente
       const initialPos = findFreePosition(piece, pw, ph, kerf);
       piece.dataset.x = initialPos.x;
       piece.dataset.y = initialPos.y;
@@ -207,7 +855,6 @@
       piece.addEventListener('click', (e) => {
         if (piece.dataset.dragged === 'true') return;
         
-        // Intentar rotar
         const currentW = parseFloat(piece.dataset.w);
         const currentH = parseFloat(piece.dataset.h);
         
@@ -217,9 +864,7 @@
         const currentX = parseFloat(piece.dataset.x);
         const currentY = parseFloat(piece.dataset.y);
 
-        // Validar si al rotar no choca con otra pieza o se sale
         if (hasCollision(piece, currentX, currentY, currentH, currentW, kerf)) {
-          // Si choca, deshacer rotación
           piece.dataset.w = currentW;
           piece.dataset.h = currentH;
           alert('No hay espacio suficiente para rotar esta pieza sin encimarse.');
@@ -269,11 +914,9 @@
     const ph = parseFloat(activePiece.dataset.h);
     const kerf = parseFloat(document.getElementById('kerf').value) || 0;
 
-    // Límites de tablero
     targetX = Math.max(0, Math.min(targetX, bw - pw));
     targetY = Math.max(0, Math.min(targetY, bh - ph));
 
-    // RESTRICCIÓN DE SUPERPOSICIÓN: Probar movimiento en X y Y por separado para deslizamiento fluido
     let finalX = parseFloat(activePiece.dataset.x);
     let finalY = parseFloat(activePiece.dataset.y);
 
@@ -293,13 +936,11 @@
     calculateStats();
   }
 
-  // Comprobar colisión entre piezas incluyendo el margen del disco (kerf)
   function hasCollision(currentPiece, x, y, w, h, kerf) {
     const pieces = document.querySelectorAll('.piece');
     const bw = parseFloat(document.getElementById('board-w').value);
     const bh = parseFloat(document.getElementById('board-h').value);
 
-    // Validar salida de tablero
     if (x < 0 || y < 0 || x + w > bw || y + h > bh) return true;
 
     for (let p of pieces) {
@@ -310,7 +951,6 @@
       const pw = parseFloat(p.dataset.w);
       const ph = parseFloat(p.dataset.h);
 
-      // Evaluación AABB considerando la zona de kerf alrededor
       const overlap = !(
         x + w + kerf <= px ||
         x >= px + pw + kerf ||
@@ -323,7 +963,6 @@
     return false;
   }
 
-  // Buscar una coordenada inicial vacía al agregar piezas
   function findFreePosition(piece, w, h, kerf) {
     const bw = parseFloat(document.getElementById('board-w').value);
     const bh = parseFloat(document.getElementById('board-h').value);
@@ -336,7 +975,7 @@
         }
       }
     }
-    return { x: 10, y: 10 }; // Respaldo
+    return { x: 10, y: 10 };
   }
 
   function stopDrag() {
@@ -346,7 +985,7 @@
   }
 
   function clearPieces() {
-    document.getElementById('board').innerHTML = '<div id="bounding-box-guide"></div>';
+    document.getElementById('board').innerHTML = '<div class="bounding-box-guide" id="bounding-box-guide"></div>';
     calculateStats();
   }
 
@@ -374,17 +1013,14 @@
 
     const usagePct = totalBoardArea > 0 ? ((totalPieceArea / totalBoardArea) * 100).toFixed(1) : 0;
 
-    // Actualizar Panel
     document.getElementById('stat-count').innerText = pieces.length;
     document.getElementById('stat-area-pieces').innerText = totalPieceArea.toFixed(2) + ' m²';
     document.getElementById('stat-usage').innerText = usagePct + '%';
 
-    // Actualizar Encabezado del Área de Trabajo
     const boundW = Math.round(maxX);
     const boundH = Math.round(maxY);
     document.getElementById('overlay-used-dim').innerText = `${boundW} x ${boundH} mm`;
 
-    // Guía Rectangular en pantalla
     const guide = document.getElementById('bounding-box-guide');
     if (pieces.length > 0 && maxX > 0 && maxY > 0) {
       guide.style.display = 'block';
