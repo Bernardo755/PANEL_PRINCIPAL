@@ -55,8 +55,10 @@
 
   <!-- Barra de Pestañas -->
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('tab1', event)">🪚 Optimizador de Cortes</button>
-    <button class="tab-btn" onclick="switchTab('tab2', event)">📑 Calculadora de Madera</button>
+
+    <button class="tab-btn active" onclick="switchTab('tab2', event)">📑 Calculadora de Madera</button>
+    <button class="tab-btn" onclick="switchTab('tab1', event)">🪚 Optimizador de Cortes</button>
+    <button class="tab-btn" onclick="switchTab('tab1', event)">📑 Inventario</button>
   </div>
 
   <!-- Contenedor de Aplicaciones -->
@@ -1035,5 +1037,621 @@
   window.onresize = updateBoard;
 </script>
 
+
+
+
+  
+<!-- PESTAÑA 3: Tu nuevo código -->
+    <div id="tab3" class="app-window">
+      <div class="main-area" style="max-width: 1200px; margin: 0 auto;">
+        <h2>Control de Inventario</h2>
+        
+       <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Gestión LYM</title>
+  
+  <!-- ==========================================
+        MÓDULO: ESTILOS (CSS CONFIGURABLE Y MODERNO)
+        ========================================== -->
+  <style>
+    :root {
+      /* COLORES PRINCIPALES */
+      --color-fondo: #f4f6f9;
+      --color-panel: #ffffff;
+      --color-primario: #0056b3;
+      --color-primario-hover: #004494;
+      --color-exito: #28a745;
+      --color-peligro: #dc3545;
+      --color-texto: #333333;
+      --color-borde: #d1d5db;
+      
+      /* MEDIDAS Y FORMATOS */
+      --radio-borde: 10px;
+      --espaciado-panel: 30px;
+      --tamano-fuente-base: 15px;
+      --fuente-familia: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --ancho-max-login: 420px;
+      --ancho-max-app: 1280px;
+    }
+
+    body {
+      font-family: var(--fuente-familia);
+      background-color: var(--color-fondo);
+      color: var(--color-texto);
+      margin: 0; padding: 0;
+      font-size: var(--tamano-fuente-base);
+    }
+    .panel {
+      background-color: var(--color-panel);
+      padding: var(--espaciado-panel);
+      border-radius: var(--radio-borde);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.04);
+      margin: 20px auto;
+      transition: all 0.3s ease;
+    }
+    input[type="text"], input[type="password"], input[type="number"], select, input[type="file"] {
+      width: 100%; padding: 11px; margin: 8px 0 15px;
+      border: 1px solid var(--color-borde);
+      border-radius: var(--radio-borde);
+      box-sizing: border-box;
+      background-color: #fafbfc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: var(--color-primario);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0,86,179,0.15);
+      background-color: #fff;
+    }
+    .btn {
+      background-color: var(--color-primario); color: white;
+      padding: 11px 22px; border: none; border-radius: var(--radio-borde);
+      cursor: pointer; font-weight: bold; transition: background 0.3s, transform 0.1s;
+      box-shadow: 0 4px 10px rgba(0,86,179,0.2);
+    }
+    .btn:hover { background-color: var(--color-primario-hover); transform: translateY(-1px); }
+    .btn-salir { background-color: var(--color-peligro); float: right; box-shadow: 0 4px 10px rgba(220,53,69,0.2); }
+    .btn-accion { background-color: var(--color-exito); width: 100%; margin-top: 10px; box-shadow: 0 4px 10px rgba(40,167,69,0.2); }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; border-radius: var(--radio-borde); overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    th, td { border: 1px solid var(--color-borde); padding: 12px; text-align: left; }
+    th { background-color: var(--color-primario); color: white; font-weight: 600; }
+    tr:nth-child(even) { background-color: #fcfdfe; }
+    #app-container { display: none; max-width: var(--ancho-max-app); margin: 0 auto; padding: 20px; }
+    #login-container { max-width: var(--ancho-max-login); margin: 100px auto; }
+    .nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--color-borde); padding-bottom: 12px; overflow-x: auto;}
+    .tab { cursor: pointer; padding: 10px 20px; border-radius: var(--radio-borde); background: #e5e9f0; font-weight: 600; transition: all 0.2s; white-space: nowrap;}
+    .tab.active { background: var(--color-primario); color: white; box-shadow: 0 4px 10px rgba(0,86,179,0.2); }
+    .seccion { display: none; }
+    .seccion.active { display: block; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .logo-empresa {
+      display: block;
+      margin: 0 auto 15px auto;
+      max-width: 140px;
+      height: auto;
+      object-fit: contain;
+    }
+    .preview-img {
+      max-width: 60px; max-height: 60px; border-radius: 6px; object-fit: cover; border: 1px solid var(--color-borde);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- VISTA 1: INGRESO -->
+  <div id="login-container" class="panel">
+    <img src="LYM.png" alt="Logo Empresa" class="logo-empresa">
+    <h2 style="text-align: center; color: var(--color-primario);">ACCESO DE SISTEMA</h2>
+    <form id="form-login" autocomplete="off" onsubmit="event.preventDefault(); iniciarSesion();">
+      <label>Usuario:</label>
+      <input type="text" id="user" required>
+      <label>Contraseña:</label>
+      <input type="password" id="pass" required>
+      <button type="submit" class="btn" style="width: 100%;">Ingresar</button>
+      <p id="msg-login" style="color: var(--color-peligro); text-align: center; margin-top: 15px; font-weight: 600;"></p>
+    </form>
+  </div>
+
+  <!-- VISTA 2: APLICACIÓN -->
+  <div id="app-container">
+    <button class="btn btn-salir" onclick="cerrarSesion()">Cerrar Sesión</button>
+    <img src="LYM.png" alt="Logo Empresa" class="logo-empresa" style="margin: 0 0 20px 0; float: left; max-width: 80px;">
+    <h2 style="clear: both; color: var(--color-primario);">Consola de Administración</h2>
+    
+    <div class="nav-tabs" id="menu-tabs">
+      <div class="tab" id="tab-calculadora" onclick="cambiarPestana('calculadora')">Calculadora</div>
+      <div class="tab active" id="tab-buscador" onclick="cambiarPestana('buscador')">Buscador</div>
+      <div class="tab" id="tab-ingresos" onclick="cambiarPestana('ingresos')">Registrar Ingreso</div>
+      <div class="tab" id="tab-salidas" onclick="cambiarPestana('salidas')">Registrar Salida</div>
+    </div>
+
+    <!-- SECCIÓN: CALCULADORA -->
+    <div id="sec-calculadora" class="seccion panel">
+      <h3>Calculadora de Costos (Regla de Tres)</h3>
+      <p style="color: #666; font-size: 14px;">Ingrese los valores por fila. Las columnas 6, 7, 8 y 9 se calculan automáticamente.</p>
+      <div style="overflow-x: auto;">
+        <table id="tabla-calculadora">
+          <thead>
+            <tr>
+              <th>1. Precio ($)</th>
+              <th>2. Factor Inicial</th>
+              <th>3. Factor Final</th>
+              <th>4. Porcentaje (%)</th>
+              <th>5. Piezas</th>
+              <th>6. Factura</th>
+              <th>7. Parcial %</th>
+              <th>8. Con Porcentaje</th>
+              <th>9. Precio Total</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="calc-tbody">
+            <!-- Fila inicial -->
+            <tr>
+              <td><input type="number" step="0.01" class="c-1" oninput="calcularFila(this)"></td>
+              <td><input type="number" step="0.01" class="c-2" oninput="calcularFila(this)"></td>
+              <td><input type="number" step="0.01" class="c-3" oninput="calcularFila(this)"></td>
+              <td><input type="number" step="0.01" class="c-4" oninput="calcularFila(this)"></td>
+              <td><input type="number" step="1" class="c-5" oninput="calcularFila(this)"></td>
+              <td><input type="number" step="0.01" class="c-6" readonly style="background:#eee;"></td>
+              <td><input type="number" step="0.01" class="c-7" readonly style="background:#eee;"></td>
+              <td><input type="number" step="0.01" class="c-8" readonly style="background:#eee;"></td>
+              <td><input type="number" step="0.01" class="c-9" readonly style="background:#eee;"></td>
+              <td><button type="button" class="btn" style="background:var(--color-peligro); padding: 5px 10px;" onclick="eliminarFilaCalc(this)">X</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" class="btn" style="margin-top: 15px;" onclick="agregarFilaCalc()">+ Agregar Fila</button>
+    </div>
+
+    <!-- SECCIÓN: BUSCADOR -->
+    <div id="sec-buscador" class="seccion active panel">
+      <h3>Buscar en Inventario</h3>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <input type="text" id="busq-texto" placeholder="Buscar producto (Mín. 3 letras)..." style="flex: 1; min-width: 200px;">
+        
+        <select id="busq-general" style="flex: 1; min-width: 150px;">
+          <option value="TODO">Búsqueda en todo</option>
+          <option value="espuma">Espuma</option>
+          <option value="barniz">Barniz</option>
+          <option value="madera">Madera</option>
+          <option value="herrajes">Herrajes</option>
+          <option value="lijas">Lijas</option>
+          <option value="empaque">Empaque</option>
+          <option value="telas">Telas</option>
+          <option value="estructuras">Estructuras</option>
+          <option value="otro">Otro</option>
+        </select>
+        
+        <select id="busq-especifica" style="flex: 1; min-width: 150px;">
+          <option value="">Sin filtro específico</option>
+          <option value="GROSOR">Grosor</option>
+          <option value="DENSIDAD">Densidad</option>
+        </select>
+        
+        <select id="busq-val-especifico" style="display:none; flex: 1; min-width: 150px;"></select>
+        
+        <button class="btn" onclick="ejecutarBusqueda()">Buscar</button>
+      </div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead><tr id="tabla-head"></tr></thead>
+          <tbody id="tabla-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECCIÓN: INGRESOS -->
+    <div id="sec-ingresos" class="seccion panel">
+      <h3>Registro de Ingresos</h3>
+      <div style="margin-bottom: 15px; background: #eef2f7; padding: 10px 15px; border-radius: 8px;">
+        <label style="cursor: pointer; font-weight: bold; color: var(--color-primario);">
+          <input type="checkbox" id="ing-solo-desc" onchange="toggleSoloDescripcion()"> Solo actualizar descripción de producto existente
+        </label>
+      </div>
+      <form id="form-ingresos">
+        <div class="form-grid">
+          <div><label>Nombre/Producto:</label><input type="text" id="ing-nombre" list="lista-inventario" onchange="verificarSiExiste('ing')" required><small id="ing-aviso"></small></div>
+          <div><label>Tipo:</label>
+            <select id="ing-tipo" required>
+              <option value="">Seleccione tipo...</option>
+              <option value="espuma">Espuma</option>
+              <option value="barniz">Barniz</option>
+              <option value="madera">Madera</option>
+              <option value="herrajes">Herrajes</option>
+              <option value="lijas">Lijas</option>
+              <option value="empaque">Empaque</option>
+              <option value="telas">Telas</option>
+              <option value="estructuras">Estructuras</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="campo-edicion"><label>Unidad de Medida:</label><select id="ing-unidad" required></select></div>
+          <div class="campo-edicion"><label>Grosor:</label><select id="ing-medidas"></select></div>
+          <div class="campo-edicion"><label>Densidad:</label><input type="text" id="ing-densidad"></div>
+          <div class="campo-edicion"><label>Cantidad:</label><input type="number" step="0.01" id="ing-cantidad" required oninput="calcularTotal('ing')"></div>
+          <div class="campo-edicion"><label>Precio:</label><input type="number" step="0.01" id="ing-precio" required oninput="calcularTotal('ing')"></div>
+          <div class="campo-edicion"><label>Total:</label><input type="number" id="ing-total" readonly></div>
+          <div class="campo-edicion"><label>Proveedor:</label><select id="ing-proveedor"></select></div>
+          <div class="campo-edicion"><label>Entregó a:</label><select id="ing-entregoa" required></select></div>
+          <div style="grid-column: span 2;"><label>Descripción:</label><input type="text" id="ing-descripcion"></div>
+          <div style="grid-column: span 2;"><label>Fotografía del Producto:</label><input type="file" id="ing-foto" accept="image/*" capture="environment"></div>
+        </div>
+        <button type="button" class="btn btn-accion" onclick="guardarTransaccion('INGRESO')">Registrar Ingreso</button>
+      </form>
+    </div>
+
+    <!-- SECCIÓN: SALIDAS -->
+    <div id="sec-salidas" class="seccion panel">
+      <h3>Registro de Salidas</h3>
+      <form id="form-salidas">
+        <div class="form-grid">
+          <div><label>Producto:</label><input type="text" id="sal-nombre" list="lista-inventario" onchange="verificarSiExiste('sal')" required></div>
+          <div><label>Tipo:</label><input type="text" id="sal-tipo" readonly></div>
+          <div><label>Unidad de Medida:</label><input type="text" id="sal-unidad" readonly></div>
+          <div><label>Cantidad:</label><input type="number" step="0.01" id="sal-cantidad" required></div>
+          <div><label>Tipo de Asignación:</label>
+            <select id="sal-tipo-asignacion" onchange="cambioTipoAsignacion()" required>
+              <option value="Asignacion">Asignación</option>
+              <option value="Prestamo">Préstamo</option>
+              <option value="Orden de Produccion">Orden de Producción</option>
+            </select>
+          </div>
+          <div id="div-orden-prod" style="display:none;"><label>Número de Orden de Producción:</label><input type="text" id="sal-orden"></div>
+          <div><label>Se entrega a:</label><select id="sal-entregoa" required></select></div>
+          <div style="grid-column: span 2;"><label>Descripción:</label><input type="text" id="sal-descripcion"></div>
+          <div style="grid-column: span 2;"><label>Fotografía de Salida:</label><input type="file" id="sal-foto" accept="image/*" capture="environment"></div>
+        </div>
+        <button type="button" class="btn btn-accion" onclick="guardarTransaccion('SALIDA')">Registrar Salida</button>
+      </form>
+    </div>
+
+    <datalist id="lista-inventario"></datalist>
+  </div>
+
+  <!-- ==========================================
+        MÓDULO: LÓGICA DE CONTROL (JS)
+        ========================================== -->
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhx7fHc9aKuw6ucSd1cUgzuV5ogR1M1pu4aEKiN4NcHdTngBA6HT9bCvJS30rV7u34Hg/exec";
+
+    let timerInactividad;
+    const TIEMPO_EXPIRACION = 3600000;
+    let datosCargados = {};
+    let usuarioActual = null;
+
+    async function ejecutarPeticionAPI(action, data = {}) {
+      try {
+        let respuesta = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: action, data: data })
+        });
+        return await respuesta.json();
+      } catch (error) {
+        console.error("Error en enlace de API:", error);
+        return { success: false, message: "Error al conectar con la base de datos." };
+      }
+    }
+
+    // CALCULADORA FUNCIONES
+    function agregarFilaCalc() {
+      let tbody = document.getElementById('calc-tbody');
+      let tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="number" step="0.01" class="c-1" oninput="calcularFila(this)"></td>
+        <td><input type="number" step="0.01" class="c-2" oninput="calcularFila(this)"></td>
+        <td><input type="number" step="0.01" class="c-3" oninput="calcularFila(this)"></td>
+        <td><input type="number" step="0.01" class="c-4" oninput="calcularFila(this)"></td>
+        <td><input type="number" step="1" class="c-5" oninput="calcularFila(this)"></td>
+        <td><input type="number" step="0.01" class="c-6" readonly style="background:#eee;"></td>
+        <td><input type="number" step="0.01" class="c-7" readonly style="background:#eee;"></td>
+        <td><input type="number" step="0.01" class="c-8" readonly style="background:#eee;"></td>
+        <td><input type="number" step="0.01" class="c-9" readonly style="background:#eee;"></td>
+        <td><button type="button" class="btn" style="background:var(--color-peligro); padding: 5px 10px;" onclick="eliminarFilaCalc(this)">X</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function eliminarFilaCalc(btn) {
+      let row = btn.closest('tr');
+      if (document.querySelectorAll('#calc-tbody tr').length > 1) {
+        row.remove();
+      }
+    }
+
+    function calcularFila(input) {
+      let row = input.closest('tr');
+      let c1 = parseFloat(row.querySelector('.c-1').value) || 0;
+      let c2 = parseFloat(row.querySelector('.c-2').value) || 0;
+      let c3 = parseFloat(row.querySelector('.c-3').value) || 0;
+      let c4 = parseFloat(row.querySelector('.c-4').value) || 0;
+      let c5 = parseFloat(row.querySelector('.c-5').value) || 0;
+
+      let c6 = c2 !== 0 ? (c1 * c3) / c2 : 0;
+      let c7 = c6 * c4;
+      let c8 = c6 + c7;
+      let c9 = c8 * c5;
+
+      row.querySelector('.c-6').value = c6.toFixed(2);
+      row.querySelector('.c-7').value = c7.toFixed(2);
+      row.querySelector('.c-8').value = c8.toFixed(2);
+      row.querySelector('.c-9').value = c9.toFixed(2);
+    }
+
+    // FILTRO ESPECÍFICO BUSCADOR
+    document.getElementById('busq-especifica').addEventListener('change', function() {
+      let selectVal = document.getElementById('busq-val-especifico');
+      let filtro = this.value;
+      selectVal.innerHTML = '';
+      if (!filtro) { selectVal.style.display = 'none'; return; }
+      let fuenteValores = (filtro === 'GROSOR') ? datosCargados.medidas : datosCargados.densidades;
+      let opcionesHTML = ['<option value="">Selecciona un valor...</option>'];
+      if(fuenteValores) {
+        fuenteValores.forEach(valor => opcionesHTML.push(`<option value="${valor}">${valor}</option>`));
+      }
+      selectVal.innerHTML = opcionesHTML.join('');
+      selectVal.style.display = 'block';
+    });
+
+    function resetTimer() {
+      clearTimeout(timerInactividad);
+      if (document.getElementById('app-container').style.display === 'block') {
+        timerInactividad = setTimeout(cerrarSesion, TIEMPO_EXPIRACION);
+      }
+    }
+    window.onload = resetTimer; document.onmousemove = resetTimer; document.onkeypress = resetTimer;
+
+    async function iniciarSesion() {
+      let u = document.getElementById('user').value;
+      let p = document.getElementById('pass').value;
+      document.getElementById('msg-login').innerText = "Validando credenciales...";
+      
+      let res = await ejecutarPeticionAPI('loginUsuario', { usuario: u, password: p });
+      
+      if (res.success) {
+        usuarioActual = res.user;
+        document.getElementById('form-login').reset();
+        document.getElementById('login-container').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+        
+        // Control de roles
+        if (usuarioActual.rol.toLowerCase() === 'user') {
+          document.getElementById('tab-calculadora').style.display = 'none';
+          document.getElementById('tab-ingresos').style.display = 'none';
+          document.getElementById('tab-salidas').style.display = 'none';
+          cambiarPestana('buscador');
+        } else {
+          document.getElementById('tab-calculadora').style.display = 'block';
+          document.getElementById('tab-ingresos').style.display = 'block';
+          document.getElementById('tab-salidas').style.display = 'block';
+          cambiarPestana('calculadora');
+        }
+
+        cargarDatosMaestros();
+        resetTimer();
+      } else {
+        document.getElementById('msg-login').innerText = res.message;
+      }
+    }
+
+    function cerrarSesion() {
+      document.getElementById('app-container').style.display = 'none';
+      document.getElementById('login-container').style.display = 'block';
+      document.getElementById('msg-login').innerText = "Sesión cerrada de forma segura.";
+      document.getElementById('form-ingresos').reset();
+      document.getElementById('form-salidas').reset();
+      clearTimeout(timerInactividad);
+    }
+
+    function cambiarPestana(id) {
+      document.querySelectorAll('.seccion').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      let sec = document.getElementById('sec-' + id);
+      let tab = document.getElementById('tab-' + id);
+      if(sec) sec.classList.add('active');
+      if(tab) tab.classList.add('active');
+    }
+
+    async function cargarDatosMaestros() {
+      let res = await ejecutarPeticionAPI('obtenerDatosFormularios');
+      datosCargados = res;
+      
+      let dl = document.getElementById('lista-inventario');
+      dl.innerHTML = '';
+      if(res.inventario) {
+        res.inventario.forEach(item => {
+          let opt = document.createElement('option'); opt.value = item.nombre; dl.appendChild(opt);
+        });
+      }
+
+      let optionsRH = '<option value="">Seleccione...</option><optgroup label="Áreas">';
+      if(res.areas) res.areas.forEach(a => optionsRH += `<option value="${a}">${a}</option>`);
+      optionsRH += '</optgroup><optgroup label="Personal">';
+      if(res.personal) res.personal.forEach(p => optionsRH += `<option value="${p}">${p}</option>`);
+      optionsRH += '</optgroup>';
+      
+      document.getElementById('ing-entregoa').innerHTML = optionsRH;
+      document.getElementById('sal-entregoa').innerHTML = optionsRH;
+
+      // Llenar selectores de unidades, grosor y proveedores
+      let optUnidades = '<option value="">Seleccione unidad...</option>';
+      if(res.unidades) res.unidades.forEach(u => optUnidades += `<option value="${u}">${u}</option>`);
+      document.getElementById('ing-unidad').innerHTML = optUnidades;
+
+      let optGrosor = '<option value="">Seleccione grosor...</option>';
+      if(res.medidas) res.medidas.forEach(m => optGrosor += `<option value="${m}">${m}</option>`);
+      document.getElementById('ing-medidas').innerHTML = optGrosor;
+
+      let optProv = '<option value="">Seleccione proveedor...</option>';
+      if(res.proveedores) res.proveedores.forEach(pr => optProv += `<option value="${pr}">${pr}</option>`);
+      document.getElementById('ing-proveedor').innerHTML = optProv;
+    }
+
+    function toggleSoloDescripcion() {
+      let soloDesc = document.getElementById('ing-solo-desc').checked;
+      let campos = document.querySelectorAll('.campo-edicion');
+      campos.forEach(c => c.style.display = soloDesc ? 'none' : 'block');
+      if(soloDesc) {
+        document.getElementById('ing-tipo').required = false;
+        document.getElementById('ing-unidad').required = false;
+        document.getElementById('ing-cantidad').required = false;
+        document.getElementById('ing-precio').required = false;
+      } else {
+        document.getElementById('ing-tipo').required = true;
+        document.getElementById('ing-unidad').required = true;
+        document.getElementById('ing-cantidad').required = true;
+        document.getElementById('ing-precio').required = true;
+      }
+    }
+
+    async function ejecutarBusqueda() {
+      let texto = document.getElementById('busq-texto').value;
+      if (texto.length < 3) { alert("Ingresa mínimo 3 letras."); return; }
+
+      document.getElementById('tabla-body').innerHTML = '<tr><td>Buscando...</td></tr>';
+      
+      let res = await ejecutarPeticionAPI('buscarEnInventario', {
+        texto: texto,
+        filtroGeneral: document.getElementById('busq-general').value,
+        filtroEspecifico: document.getElementById('busq-especifica').value,
+        valorEspecifico: document.getElementById('busq-val-especifico').value
+      });
+
+      let thead = ''; 
+      if(res.cabeceras) {
+        res.cabeceras.forEach(c => thead += `<th>${c}</th>`);
+        thead += `<th>Foto</th>`;
+      }
+      document.getElementById('tabla-head').innerHTML = thead;
+      
+      let tbody = '';
+      if (!res.data || res.data.length === 0) { tbody = '<tr><td colspan="15">Sin coincidencias</td></tr>'; } 
+      else {
+        res.data.forEach(f => {
+          tbody += '<tr>';
+          f.forEach(c => tbody += `<td>${c && c.toString().includes('GMT') ? new Date(c).toLocaleDateString() : c}</td>`);
+          // Columna de Foto URL
+          let fotoUrl = f[13] || ''; // Asumiendo que la foto se guarda en columna índice 13 o equivalente
+          tbody += `<td>${fotoUrl ? `<a href="${fotoUrl}" target="_blank"><img src="${fotoUrl}" class="preview-img"></a>` : 'Sin foto'}</td>`;
+          tbody += '</tr>';
+        });
+      }
+      document.getElementById('tabla-body').innerHTML = tbody;
+    }
+
+    function verificarSiExiste(prefijo) {
+      let val = document.getElementById(prefijo + '-nombre').value;
+      if(!datosCargados.inventario) return;
+      let item = datosCargados.inventario.find(i => i.nombre.toLowerCase() === val.toLowerCase());
+      
+      if (prefijo === 'ing') {
+        let aviso = document.getElementById('ing-aviso');
+        aviso.innerText = item ? "Producto EXISTENTE: Se sumará al stock." : "NUEVO PRODUCTO: Se creará.";
+        aviso.style.color = item ? "var(--color-primario)" : "var(--color-exito)";
+      } else if (prefijo === 'sal') {
+        if (item) {
+          document.getElementById('sal-tipo').value = item.tipo || '';
+          document.getElementById('sal-unidad').value = item.unidad || '';
+        } else {
+          alert("El producto no existe."); 
+          document.getElementById('sal-nombre').value = '';
+          document.getElementById('sal-tipo').value = '';
+          document.getElementById('sal-unidad').value = '';
+        }
+      }
+    }
+
+    function calcularTotal(prefijo) {
+      let c = parseFloat(document.getElementById(prefijo + '-cantidad').value) || 0;
+      let p = parseFloat(document.getElementById(prefijo + '-precio').value) || 0;
+      document.getElementById(prefijo + '-total').value = (c * p).toFixed(2);
+    }
+
+    function cambioTipoAsignacion() {
+      let tipo = document.getElementById('sal-tipo-asignacion').value;
+      let divOrden = document.getElementById('div-orden-prod');
+      if (tipo === 'Orden de Produccion') {
+        divOrden.style.display = 'block';
+        document.getElementById('sal-orden').required = true;
+      } else {
+        divOrden.style.display = 'none';
+        document.getElementById('sal-orden').required = false;
+      }
+    }
+
+    function convertirFileToBase64(fileInputId) {
+      return new Promise((resolve) => {
+        let fileInput = document.getElementById(fileInputId);
+        if (!fileInput.files || fileInput.files.length === 0) { resolve(null); return; }
+        let reader = new FileReader();
+        reader.onload = function(e) { resolve({ name: fileInput.files[0].name, data: e.target.result }); };
+        reader.readAsDataURL(fileInput.files[0]);
+      });
+    }
+
+    async function guardarTransaccion(tipoTx) {
+      let prefijo = tipoTx === 'INGRESO' ? 'ing' : 'sal';
+      let nombre = document.getElementById(prefijo + '-nombre').value;
+      if (!nombre) return alert("Nombre requerido");
+
+      let soloDesc = tipoTx === 'INGRESO' ? document.getElementById('ing-solo-desc').checked : false;
+      let fotoObj = await convertirFileToBase64(prefijo + '-foto');
+
+      let datos = {
+        soloDescripcion: soloDesc,
+        tipo: document.getElementById(prefijo + '-tipo') ? document.getElementById(prefijo + '-tipo').value : document.getElementById('sal-tipo').value,
+        movimiento: tipoTx, 
+        nombre: nombre,
+        unidad: document.getElementById(prefijo + '-unidad') ? document.getElementById(prefijo + '-unidad').value : document.getElementById('sal-unidad').value,
+        medidas: document.getElementById(prefijo + '-medidas') ? document.getElementById(prefijo + '-medidas').value : '',
+        densidad: document.getElementById(prefijo + '-densidad') ? document.getElementById(prefijo + '-densidad').value : '',
+        cantidad: document.getElementById(prefijo + '-cantidad').value,
+        precio: document.getElementById(prefijo + '-precio') ? document.getElementById(prefijo + '-precio').value : 0,
+        total: document.getElementById(prefijo + '-total') ? document.getElementById(prefijo + '-total').value : 0,
+        proveedor: document.getElementById(prefijo + '-proveedor') ? document.getElementById(prefijo + '-proveedor').value : '',
+        descripcion: document.getElementById(prefijo + '-descripcion').value || '',
+        entregoA: document.getElementById(prefijo + '-entregoa').value,
+        foto: fotoObj,
+        esNuevo: tipoTx === 'INGRESO' ? !datosCargados.inventario.find(i => i.nombre.toLowerCase() === nombre.toLowerCase()) : false
+      };
+
+      if (tipoTx === 'SALIDA') {
+        let tipoAsignacionVal = document.getElementById('sal-tipo-asignacion').value;
+        datos.tipoAsignacion = tipoAsignacionVal;
+        datos.ordenProd = tipoAsignacionVal === 'Orden de Produccion' ? document.getElementById('sal-orden').value : tipoAsignacionVal;
+      }
+
+      let btn = event.target; btn.disabled = true;
+      let res = await ejecutarPeticionAPI('procesarTransaccion', { tipoTx: tipoTx, datos: datos });
+      btn.disabled = false;
+      
+      alert(res.message);
+      if (res.success) {
+        document.getElementById('form-' + (tipoTx==='INGRESO'?'ingresos':'salidas')).reset();
+        if(document.getElementById('ing-aviso')) document.getElementById('ing-aviso').innerText = '';
+        if(tipoTx === 'INGRESO') { document.getElementById('ing-solo-desc').checked = false; toggleSoloDescripcion(); }
+        cargarDatosMaestros();
+      }
+    }
+  </script>
+</body>
+</html>
+        <div class="group">
+          <label>Ejemplo de campo nuevo</label>
+          <input type="text" placeholder="Escribe algo...">
+        </div>
+
+      </div>
+    </div>
+
+
+  
 </body>
 </html>
