@@ -1062,34 +1062,35 @@
       <div class="main-area" style="max-width: 1200px; margin: 0 auto;">
         <h2>Control de Inventario</h2>
         
-       <!DOCTYPE html>
+      <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Sistema de Gestión LYM</title>
   
   <!-- ==========================================
-        MÓDULO: ESTILOS (CSS CONFIGURABLE Y MODERNO)
-        ========================================== -->
+       MÓDULO: ESTILOS (CSS CONFIGURABLE Y CAPAS MODERNIZADAS)
+       ========================================== -->
   <style>
     :root {
       /* COLORES PRINCIPALES */
-      --color-fondo: #f4f6f9;
+      --color-fondo: #ffe6f0;/*#f4f6f9;*/
       --color-panel: #ffffff;
       --color-primario: #0056b3;
       --color-primario-hover: #004494;
       --color-exito: #28a745;
       --color-peligro: #dc3545;
       --color-texto: #333333;
-      --color-borde: #d1d5db;
+      --color-borde: #f5c6cb; /*#dce2e6;*/
+      --color-sombra: rgba(0, 86, 179, 0.08);
       
       /* MEDIDAS Y FORMATOS */
       --radio-borde: 10px;
-      --espaciado-panel: 30px;
+      --espaciado-panel: 25px;
       --tamano-fuente-base: 15px;
       --fuente-familia: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       --ancho-max-login: 420px;
-      --ancho-max-app: 1280px;
+      --ancho-max-app: 1250px;
     }
 
     body {
@@ -1099,154 +1100,180 @@
       margin: 0; padding: 0;
       font-size: var(--tamano-fuente-base);
     }
+
+    /* CAPAS / PANELS MÁS VISIBLES Y DEFINIDOS */
     .panel {
       background-color: var(--color-panel);
       padding: var(--espaciado-panel);
       border-radius: var(--radio-borde);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      border: 1px solid rgba(0,0,0,0.04);
+      border: 1px solid var(--color-borde);
+      box-shadow: 0 6px 18px var(--color-sombra);
       margin: 20px auto;
       transition: all 0.3s ease;
     }
+
     input[type="text"], input[type="password"], input[type="number"], select, input[type="file"] {
-      width: 100%; padding: 11px; margin: 8px 0 15px;
-      border: 1px solid var(--color-borde);
-      border-radius: var(--radio-borde);
+      width: 100%; padding: 10px 12px; margin: 6px 0 14px;
+      border: 1px solid #c4cdd5;
+      border-radius: 6px;
       box-sizing: border-box;
       background-color: #fafbfc;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
+
     input:focus, select:focus {
       border-color: var(--color-primario);
       outline: none;
-      box-shadow: 0 0 0 3px rgba(0,86,179,0.15);
+      box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.15);
       background-color: #fff;
     }
+
     .btn {
       background-color: var(--color-primario); color: white;
-      padding: 11px 22px; border: none; border-radius: var(--radio-borde);
+      padding: 10px 20px; border: none; border-radius: 6px;
       cursor: pointer; font-weight: bold; transition: background 0.3s, transform 0.1s;
-      box-shadow: 0 4px 10px rgba(0,86,179,0.2);
+      display: inline-block; text-align: center;
     }
-    .btn:hover { background-color: var(--color-primario-hover); transform: translateY(-1px); }
-    .btn-salir { background-color: var(--color-peligro); float: right; box-shadow: 0 4px 10px rgba(220,53,69,0.2); }
-    .btn-accion { background-color: var(--color-exito); width: 100%; margin-top: 10px; box-shadow: 0 4px 10px rgba(40,167,69,0.2); }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; border-radius: var(--radio-borde); overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    th, td { border: 1px solid var(--color-borde); padding: 12px; text-align: left; }
-    th { background-color: var(--color-primario); color: white; font-weight: 600; }
-    tr:nth-child(even) { background-color: #fcfdfe; }
+    .btn:hover { background-color: var(--color-primario-hover); }
+    .btn:active { transform: scale(0.98); }
+    .btn-salir { background-color: var(--color-peligro); float: right;}
+    .btn-accion { background-color: var(--color-exito); width: 100%; margin-top: 10px; padding: 12px;}
+    .btn-secundario { background-color: #6c757d; margin-top: 10px; }
+
+    /* TABLAS ESTILIZADAS */
+    table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; border-radius: 8px; overflow: hidden; border: 1px solid var(--color-borde); }
+    th, td { border-bottom: 1px solid var(--color-borde); border-right: 1px solid var(--color-borde); padding: 10px; text-align: left; font-size: 14px; }
+    th { background-color: var(--color-primario); color: white; font-weight: 600; text-transform: uppercase; font-size: 13px; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) { background-color: #f8fafc; }
+
     #app-container { display: none; max-width: var(--ancho-max-app); margin: 0 auto; padding: 20px; }
-    #login-container { max-width: var(--ancho-max-login); margin: 100px auto; }
-    .nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--color-borde); padding-bottom: 12px; overflow-x: auto;}
-    .tab { cursor: pointer; padding: 10px 20px; border-radius: var(--radio-borde); background: #e5e9f0; font-weight: 600; transition: all 0.2s; white-space: nowrap;}
-    .tab.active { background: var(--color-primario); color: white; box-shadow: 0 4px 10px rgba(0,86,179,0.2); }
+    #login-container { max-width: var(--ancho-max-login); margin: 80px auto; }
+    
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--color-borde); padding-bottom: 8px;}
+    .tab { cursor: pointer; padding: 10px 18px; border-radius: 6px 6px 0 0; background: #e9ecef; font-weight: 600; color: #495057; transition: all 0.2s;}
+    .tab.active { background: var(--color-primario); color: white; }
+    .tab:hover:not(.active) { background: #dee2e6; }
+    
     .seccion { display: none; }
     .seccion.active { display: block; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
     .logo-empresa {
       display: block;
       margin: 0 auto 15px auto;
-      max-width: 140px;
+      max-width: 400px;
       height: auto;
       object-fit: contain;
     }
-    .preview-img {
-      max-width: 60px; max-height: 60px; border-radius: 6px; object-fit: cover; border: 1px solid var(--color-borde);
+
+    /* ESTILOS DE CALCULADORA */
+    .calc-table input { margin: 0; padding: 6px; font-size: 13px; }
+    .calc-table td { padding: 5px; }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #eef4fc;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #b8daff;
+      margin-bottom: 15px;
+      grid-column: span 2;
     }
+    .checkbox-container input { width: auto; margin: 0; cursor: pointer; }
+    .btn-ver-foto { background-color: #17a2b8; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; }
   </style>
 </head>
 <body>
 
   <!-- VISTA 1: INGRESO -->
   <div id="login-container" class="panel">
-    <img src="LYM.png" alt="Logo Empresa" class="logo-empresa">
-    <h2 style="text-align: center; color: var(--color-primario);">ACCESO DE SISTEMA</h2>
+    <img src="LYM2.png" alt="Logo Empresa" class="logo-empresa">
+    <h2 style="text-align: center; color: var(--color-primario); margin-top: 0;">ACCESO DE SISTEMA</h2>
     <form id="form-login" autocomplete="off" onsubmit="event.preventDefault(); iniciarSesion();">
       <label>Usuario:</label>
       <input type="text" id="user" required>
       <label>Contraseña:</label>
       <input type="password" id="pass" required>
       <button type="submit" class="btn" style="width: 100%;">Ingresar</button>
-      <p id="msg-login" style="color: var(--color-peligro); text-align: center; margin-top: 15px; font-weight: 600;"></p>
+      <p id="msg-login" style="color: var(--color-peligro); text-align: center; font-weight: bold;"></p>
     </form>
   </div>
 
   <!-- VISTA 2: APLICACIÓN -->
   <div id="app-container">
     <button class="btn btn-salir" onclick="cerrarSesion()">Cerrar Sesión</button>
-    <img src="LYM.png" alt="Logo Empresa" class="logo-empresa" style="margin: 0 0 20px 0; float: left; max-width: 80px;">
-    <h2 style="clear: both; color: var(--color-primario);">Consola de Administración</h2>
+    <img src="LYM2.png" alt="Logo Empresa" class="logo-empresa" style="margin: 0 15px 20px 0; float: left; max-width: 400px;">
     
-    <div class="nav-tabs" id="menu-tabs">
-      <div class="tab" id="tab-calculadora" onclick="cambiarPestana('calculadora')">Calculadora</div>
-      <div class="tab active" id="tab-buscador" onclick="cambiarPestana('buscador')">Buscador</div>
-      <div class="tab" id="tab-ingresos" onclick="cambiarPestana('ingresos')">Registrar Ingreso</div>
-      <div class="tab" id="tab-salidas" onclick="cambiarPestana('salidas')">Registrar Salida</div>
+    <h2 style="clear: right; color: var(--color-primario);">Consola de Administración</h2>
+    
+    <!-- PESTAÑAS NAVEGACIÓN -->
+    <div class="nav-tabs" id="main-nav-tabs">
+      <div class="tab" id="tab-calc" onclick="cambiarPestana('calculadora')">Calculadora</div>
+      <div class="tab active" id="tab-busq" onclick="cambiarPestana('buscador')">Buscador</div>
+      <div class="tab" id="tab-ing" onclick="cambiarPestana('ingresos')">Registrar Ingreso</div>
+      <div class="tab" id="tab-sal" onclick="cambiarPestana('salidas')">Registrar Salida</div>
     </div>
 
-    <!-- SECCIÓN: CALCULADORA -->
+    <!-- SECCIÓN 0: CALCULADORA -->
     <div id="sec-calculadora" class="seccion panel">
-      <h3>Calculadora de Costos (Regla de Tres)</h3>
-      <p style="color: #666; font-size: 14px;">Ingrese los valores por fila. Las columnas 6, 7, 8 y 9 se calculan automáticamente.</p>
+      <h3>Calculadora de Regla de Tres y Costos</h3>
       <div style="overflow-x: auto;">
-        <table id="tabla-calculadora">
+        <table class="calc-table">
           <thead>
             <tr>
-              <th>1. Precio ($)</th>
-              <th>2. Factor Inicial</th>
-              <th>3. Factor Final</th>
-              <th>4. Porcentaje (%)</th>
-              <th>5. Piezas</th>
-              <th>6. Factura</th>
-              <th>7. Parcial %</th>
-              <th>8. Con Porcentaje</th>
-              <th>9. Precio Total</th>
+              <th>Precio ($)</th>
+              <th>Factor In.</th>
+              <th>Factor Fin.</th>
+              <th>%</th>
+              <th>Piezas</th>
+              <th>Factura</th>
+              <th>Con %</th>
+              <th>Subtotal</th>
+              <th>Precio Total</th>
               <th>Acción</th>
             </tr>
           </thead>
-          <tbody id="calc-tbody">
-            <!-- Fila inicial -->
-            <tr>
-              <td><input type="number" step="0.01" class="c-1" oninput="calcularFila(this)"></td>
-              <td><input type="number" step="0.01" class="c-2" oninput="calcularFila(this)"></td>
-              <td><input type="number" step="0.01" class="c-3" oninput="calcularFila(this)"></td>
-              <td><input type="number" step="0.01" class="c-4" oninput="calcularFila(this)"></td>
-              <td><input type="number" step="1" class="c-5" oninput="calcularFila(this)"></td>
-              <td><input type="number" step="0.01" class="c-6" readonly style="background:#eee;"></td>
-              <td><input type="number" step="0.01" class="c-7" readonly style="background:#eee;"></td>
-              <td><input type="number" step="0.01" class="c-8" readonly style="background:#eee;"></td>
-              <td><input type="number" step="0.01" class="c-9" readonly style="background:#eee;"></td>
-              <td><button type="button" class="btn" style="background:var(--color-peligro); padding: 5px 10px;" onclick="eliminarFilaCalc(this)">X</button></td>
-            </tr>
+          <tbody id="calc-body">
+            <!-- Filas dinámicas -->
           </tbody>
         </table>
       </div>
-      <button type="button" class="btn" style="margin-top: 15px;" onclick="agregarFilaCalc()">+ Agregar Fila</button>
+      <button class="btn btn-secundario" onclick="agregarFilaCalculadora()">+ Agregar Fila</button>
     </div>
 
-    <!-- SECCIÓN: BUSCADOR -->
+    <!-- SECCIÓN 1: BUSCADOR -->
     <div id="sec-buscador" class="seccion active panel">
-      <h3>Buscar en Inventario</h3>
+      <h3>Buscar Información</h3>
       <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-        <input type="text" id="busq-texto" placeholder="Buscar producto (Mín. 3 letras)..." style="flex: 1; min-width: 200px;">
+        
+        <!-- NUEVO: SELECCIÓN DE HOJA -->
+        <select id="busq-hoja" style="flex: 1; min-width: 130px; background-color: #eef4fc; border-color: var(--color-primario);">
+          <option value="Inventario">Inventario</option>
+          <option value="Entradas">Entradas</option>
+          <option value="Salidas">Salidas</option>
+        </select>
+
+        <input type="text" id="busq-texto" placeholder="Buscar producto (Mín. 3 letras)..." style="flex: 2; min-width: 200px;">
         
         <select id="busq-general" style="flex: 1; min-width: 150px;">
           <option value="TODO">Búsqueda en todo</option>
-          <option value="espuma">Espuma</option>
-          <option value="barniz">Barniz</option>
-          <option value="madera">Madera</option>
-          <option value="herrajes">Herrajes</option>
-          <option value="lijas">Lijas</option>
-          <option value="empaque">Empaque</option>
-          <option value="telas">Telas</option>
-          <option value="estructuras">Estructuras</option>
-          <option value="otro">Otro</option>
+          <option value="Espuma">Espuma</option>
+          <option value="Barniz">Barniz</option>
+          <option value="Madera">Madera</option>
+          <option value="Herrajes">Herrajes</option>
+          <option value="Lijas">Lijas</option>
+          <option value="Empaque">Empaque</option>
+          <option value="Telas">Telas</option>
+          <option value="Estructuras">Estructuras</option>
+          <option value="Otro">Otro</option>
         </select>
         
         <select id="busq-especifica" style="flex: 1; min-width: 150px;">
           <option value="">Sin filtro específico</option>
-          <option value="GROSOR">Grosor</option>
+          <option value="MEDIDAS">Grosor / Medidas</option>
           <option value="DENSIDAD">Densidad</option>
         </select>
         
@@ -1262,66 +1289,134 @@
       </div>
     </div>
 
-    <!-- SECCIÓN: INGRESOS -->
+    <!-- SECCIÓN 2: INGRESOS -->
     <div id="sec-ingresos" class="seccion panel">
       <h3>Registro de Ingresos</h3>
-      <div style="margin-bottom: 15px; background: #eef2f7; padding: 10px 15px; border-radius: 8px;">
-        <label style="cursor: pointer; font-weight: bold; color: var(--color-primario);">
-          <input type="checkbox" id="ing-solo-desc" onchange="toggleSoloDescripcion()"> Solo actualizar descripción de producto existente
-        </label>
+      
+      <div class="checkbox-container">
+        <input type="checkbox" id="ing-chk-solo-desc" onchange="toggleEdicionDescripcion()">
+        <label for="ing-chk-solo-desc"><strong>Editar únicamente la descripción de un producto existente</strong></label>
       </div>
+
       <form id="form-ingresos">
         <div class="form-grid">
-          <div><label>Nombre/Producto:</label><input type="text" id="ing-nombre" list="lista-inventario" onchange="verificarSiExiste('ing')" required><small id="ing-aviso"></small></div>
-          <div><label>Tipo:</label>
-            <select id="ing-tipo" required>
-              <option value="">Seleccione tipo...</option>
-              <option value="espuma">Espuma</option>
-              <option value="barniz">Barniz</option>
-              <option value="madera">Madera</option>
-              <option value="herrajes">Herrajes</option>
-              <option value="lijas">Lijas</option>
-              <option value="empaque">Empaque</option>
-              <option value="telas">Telas</option>
-              <option value="estructuras">Estructuras</option>
-              <option value="otro">Otro</option>
-            </select>
+          <div>
+            <label>Nombre/Producto:</label>
+            <input type="text" id="ing-nombre" list="lista-inventario" onchange="verificarSiExiste('ing')" required placeholder="Seleccione o escriba...">
+            <small id="ing-aviso"></small>
           </div>
-          <div class="campo-edicion"><label>Unidad de Medida:</label><select id="ing-unidad" required></select></div>
-          <div class="campo-edicion"><label>Grosor:</label><select id="ing-medidas"></select></div>
-          <div class="campo-edicion"><label>Densidad:</label><input type="text" id="ing-densidad"></div>
-          <div class="campo-edicion"><label>Cantidad:</label><input type="number" step="0.01" id="ing-cantidad" required oninput="calcularTotal('ing')"></div>
-          <div class="campo-edicion"><label>Precio:</label><input type="number" step="0.01" id="ing-precio" required oninput="calcularTotal('ing')"></div>
-          <div class="campo-edicion"><label>Total:</label><input type="number" id="ing-total" readonly></div>
-          <div class="campo-edicion"><label>Proveedor:</label><select id="ing-proveedor"></select></div>
-          <div class="campo-edicion"><label>Entregó a:</label><select id="ing-entregoa" required></select></div>
-          <div style="grid-column: span 2;"><label>Descripción:</label><input type="text" id="ing-descripcion"></div>
-          <div style="grid-column: span 2;"><label>Fotografía del Producto:</label><input type="file" id="ing-foto" accept="image/*" capture="environment"></div>
+          <div>
+            <label>Tipo:</label>
+            <!-- REEMPLAZADO POR DATALIST -->
+            <input type="text" id="ing-tipo" list="lista-tipos" class="ing-req" required placeholder="Seleccione o escriba...">
+            <datalist id="lista-tipos">
+              <option value="Espuma">
+              <option value="Barniz">
+              <option value="Madera">
+              <option value="Herrajes">
+              <option value="Lijas">
+              <option value="Empaque">
+              <option value="Telas">
+              <option value="Estructuras">
+              <option value="Otro">
+            </datalist>
+          </div>
+          <div>
+            <label>Unidad de Medida:</label>
+            <input type="text" id="ing-unidad" list="lista-unidades" class="ing-req" required placeholder="Seleccione o escriba...">
+            <datalist id="lista-unidades"></datalist>
+          </div>
+          <div>
+            <label>Grosor:</label>
+            <input type="text" id="ing-medidas" list="lista-medidas" placeholder="Seleccione o escriba...">
+            <datalist id="lista-medidas"></datalist>
+          </div>
+          <div>
+            <label>Densidad:</label>
+            <input type="text" id="ing-densidad" list="lista-densidades" placeholder="Seleccione o escriba...">
+            <datalist id="lista-densidades"></datalist>
+          </div>
+          <div>
+            <label>Cantidad:</label>
+            <input type="number" step="0.01" id="ing-cantidad" class="ing-req" required oninput="calcularTotal('ing')">
+          </div>
+          <div>
+            <label>Precio ($):</label>
+            <input type="number" step="0.01" id="ing-precio" class="ing-req" required oninput="calcularTotal('ing')">
+          </div>
+          <div>
+            <label>Total ($):</label>
+            <input type="number" id="ing-total" readonly>
+          </div>
+          <div>
+            <label>Proveedor:</label>
+            <input type="text" id="ing-proveedor" list="lista-proveedores" placeholder="Seleccione o escriba...">
+            <datalist id="lista-proveedores"></datalist>
+          </div>
+          <div>
+            <label>Entregó a:</label>
+            <select id="ing-entregoa" class="ing-req" required></select>
+          </div>
+          <div style="grid-column: span 2;">
+            <label>Descripción:</label>
+            <input type="text" id="ing-descripcion">
+          </div>
+          <div style="grid-column: span 2;">
+            <label>Fotografía del producto (Opcional):</label>
+            <input type="file" id="ing-foto" accept="image/*" capture="environment" onchange="procesarFoto(this, 'ing-foto-data')">
+            <input type="hidden" id="ing-foto-data">
+          </div>
         </div>
-        <button type="button" class="btn btn-accion" onclick="guardarTransaccion('INGRESO')">Registrar Ingreso</button>
+        <button type="button" id="btn-guardar-ing" class="btn btn-accion" onclick="guardarTransaccion('INGRESO')">Registrar Ingreso</button>
       </form>
     </div>
 
-    <!-- SECCIÓN: SALIDAS -->
+    <!-- SECCIÓN 3: SALIDAS -->
     <div id="sec-salidas" class="seccion panel">
       <h3>Registro de Salidas</h3>
       <form id="form-salidas">
         <div class="form-grid">
-          <div><label>Producto:</label><input type="text" id="sal-nombre" list="lista-inventario" onchange="verificarSiExiste('sal')" required></div>
-          <div><label>Tipo:</label><input type="text" id="sal-tipo" readonly></div>
-          <div><label>Unidad de Medida:</label><input type="text" id="sal-unidad" readonly></div>
-          <div><label>Cantidad:</label><input type="number" step="0.01" id="sal-cantidad" required></div>
-          <div><label>Tipo de Asignación:</label>
-            <select id="sal-tipo-asignacion" onchange="cambioTipoAsignacion()" required>
-              <option value="Asignacion">Asignación</option>
-              <option value="Prestamo">Préstamo</option>
-              <option value="Orden de Produccion">Orden de Producción</option>
+          <div style="grid-column: span 2;">
+            <label>Producto:</label>
+            <input type="text" id="sal-nombre" list="lista-inventario" onchange="cargarDatosSalida()" required>
+          </div>
+          <div>
+            <label>Tipo:</label>
+            <input type="text" id="sal-tipo" readonly style="background:#e9ecef;">
+          </div>
+          <div>
+            <label>Unidad de Medida:</label>
+            <input type="text" id="sal-unidad" readonly style="background:#e9ecef;">
+          </div>
+          <div>
+            <label>Cantidad a Sacar:</label>
+            <input type="number" step="0.01" id="sal-cantidad" required>
+          </div>
+          <div>
+            <label>Tipo de Asignación:</label>
+            <select id="sal-tipo-asig" onchange="toggleTipoAsignacion()" required>
+              <option value="Orden de Producción">Orden de Producción</option>
+              <option value="Asignación">Asignación</option>
+              <option value="Préstamo">Préstamo</option>
             </select>
           </div>
-          <div id="div-orden-prod" style="display:none;"><label>Número de Orden de Producción:</label><input type="text" id="sal-orden"></div>
-          <div><label>Se entrega a:</label><select id="sal-entregoa" required></select></div>
-          <div style="grid-column: span 2;"><label>Descripción:</label><input type="text" id="sal-descripcion"></div>
-          <div style="grid-column: span 2;"><label>Fotografía de Salida:</label><input type="file" id="sal-foto" accept="image/*" capture="environment"></div>
+          <div id="div-sal-orden">
+            <label>No. Orden de Producción:</label>
+            <input type="text" id="sal-orden" placeholder="Escriba la orden...">
+          </div>
+          <div>
+            <label>Se entrega a:</label>
+            <select id="sal-entregoa" required></select>
+          </div>
+          <div style="grid-column: span 2;">
+            <label>Descripción / Notas:</label>
+            <input type="text" id="sal-descripcion">
+          </div>
+          <div style="grid-column: span 2;">
+            <label>Fotografía de la Salida (Opcional):</label>
+            <input type="file" id="sal-foto" accept="image/*" capture="environment" onchange="procesarFoto(this, 'sal-foto-data')">
+            <input type="hidden" id="sal-foto-data">
+          </div>
         </div>
         <button type="button" class="btn btn-accion" onclick="guardarTransaccion('SALIDA')">Registrar Salida</button>
       </form>
@@ -1331,13 +1426,13 @@
   </div>
 
   <!-- ==========================================
-        MÓDULO: LÓGICA DE CONTROL (JS)
-        ========================================== -->
+       MÓDULO: ENLACE Y LÓGICA DE CONTROL (JS)
+       ========================================== -->
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhx7fHc9aKuw6ucSd1cUgzuV5ogR1M1pu4aEKiN4NcHdTngBA6HT9bCvJS30rV7u34Hg/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0lrN1OBnDDGaxoxucUAvdm20tdjsupg4trwSezy0oqvoHYFfFjlli566IVxib8LfgWQ/exec";
 
     let timerInactividad;
-    const TIEMPO_EXPIRACION = 3600000;
+    const TIEMPO_EXPIRACION = 3600000; // 1 hora
     let datosCargados = {};
     let usuarioActual = null;
 
@@ -1351,79 +1446,47 @@
         });
         return await respuesta.json();
       } catch (error) {
-        console.error("Error en enlace de API:", error);
-        return { success: false, message: "Error al conectar con la base de datos." };
+        console.error("Error en API:", error);
+        return { success: false, message: "Error al conectar con la base de datos distribuida." };
       }
     }
 
-    // CALCULADORA FUNCIONES
-    function agregarFilaCalc() {
-      let tbody = document.getElementById('calc-tbody');
-      let tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><input type="number" step="0.01" class="c-1" oninput="calcularFila(this)"></td>
-        <td><input type="number" step="0.01" class="c-2" oninput="calcularFila(this)"></td>
-        <td><input type="number" step="0.01" class="c-3" oninput="calcularFila(this)"></td>
-        <td><input type="number" step="0.01" class="c-4" oninput="calcularFila(this)"></td>
-        <td><input type="number" step="1" class="c-5" oninput="calcularFila(this)"></td>
-        <td><input type="number" step="0.01" class="c-6" readonly style="background:#eee;"></td>
-        <td><input type="number" step="0.01" class="c-7" readonly style="background:#eee;"></td>
-        <td><input type="number" step="0.01" class="c-8" readonly style="background:#eee;"></td>
-        <td><input type="number" step="0.01" class="c-9" readonly style="background:#eee;"></td>
-        <td><button type="button" class="btn" style="background:var(--color-peligro); padding: 5px 10px;" onclick="eliminarFilaCalc(this)">X</button></td>
-      `;
-      tbody.appendChild(tr);
-    }
-
-    function eliminarFilaCalc(btn) {
-      let row = btn.closest('tr');
-      if (document.querySelectorAll('#calc-tbody tr').length > 1) {
-        row.remove();
-      }
-    }
-
-    function calcularFila(input) {
-      let row = input.closest('tr');
-      let c1 = parseFloat(row.querySelector('.c-1').value) || 0;
-      let c2 = parseFloat(row.querySelector('.c-2').value) || 0;
-      let c3 = parseFloat(row.querySelector('.c-3').value) || 0;
-      let c4 = parseFloat(row.querySelector('.c-4').value) || 0;
-      let c5 = parseFloat(row.querySelector('.c-5').value) || 0;
-
-      let c6 = c2 !== 0 ? (c1 * c3) / c2 : 0;
-      let c7 = c6 * c4;
-      let c8 = c6 + c7;
-      let c9 = c8 * c5;
-
-      row.querySelector('.c-6').value = c6.toFixed(2);
-      row.querySelector('.c-7').value = c7.toFixed(2);
-      row.querySelector('.c-8').value = c8.toFixed(2);
-      row.querySelector('.c-9').value = c9.toFixed(2);
-    }
-
-    // FILTRO ESPECÍFICO BUSCADOR
+    // LISTENER PARA CONTROLAR EL DESPLEGABLE DE BÚSQUEDA ESPECÍFICA
     document.getElementById('busq-especifica').addEventListener('change', function() {
       let selectVal = document.getElementById('busq-val-especifico');
       let filtro = this.value;
       selectVal.innerHTML = '';
-      if (!filtro) { selectVal.style.display = 'none'; return; }
-      let fuenteValores = (filtro === 'GROSOR') ? datosCargados.medidas : datosCargados.densidades;
-      let opcionesHTML = ['<option value="">Selecciona un valor...</option>'];
-      if(fuenteValores) {
-        fuenteValores.forEach(valor => opcionesHTML.push(`<option value="${valor}">${valor}</option>`));
+      
+      if (!filtro) {
+        selectVal.style.display = 'none';
+        return;
       }
+      
+      let fuenteValores = (filtro === 'MEDIDAS') ? datosCargados.medidas : datosCargados.densidades;
+      let opcionesHTML = ['<option value="">Selecciona valor...</option>'];
+      (fuenteValores || []).forEach(valor => {
+        opcionesHTML.push(`<option value="${valor}">${valor}</option>`);
+      });
+      
       selectVal.innerHTML = opcionesHTML.join('');
       selectVal.style.display = 'block';
     });
 
+    // CONTROL INACTIVIDAD
     function resetTimer() {
       clearTimeout(timerInactividad);
       if (document.getElementById('app-container').style.display === 'block') {
         timerInactividad = setTimeout(cerrarSesion, TIEMPO_EXPIRACION);
       }
     }
-    window.onload = resetTimer; document.onmousemove = resetTimer; document.onkeypress = resetTimer;
+    window.onload = function() {
+      resetTimer();
+      agregarFilaCalculadora();
+    }; 
+    document.onmousemove = resetTimer; 
+    document.onkeypress = resetTimer;
 
+    // LOGIN CON CONTROL DE ROLES
     async function iniciarSesion() {
       let u = document.getElementById('user').value;
       let p = document.getElementById('pass').value;
@@ -1437,24 +1500,23 @@
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
         
-        // Control de roles
-        if (usuarioActual.rol.toLowerCase() === 'user') {
-          document.getElementById('tab-calculadora').style.display = 'none';
-          document.getElementById('tab-ingresos').style.display = 'none';
-          document.getElementById('tab-salidas').style.display = 'none';
-          cambiarPestana('buscador');
-        } else {
-          document.getElementById('tab-calculadora').style.display = 'block';
-          document.getElementById('tab-ingresos').style.display = 'block';
-          document.getElementById('tab-salidas').style.display = 'block';
-          cambiarPestana('calculadora');
-        }
-
+        aplicarPermisosPorRol(usuarioActual.rol);
         cargarDatosMaestros();
         resetTimer();
       } else {
         document.getElementById('msg-login').innerText = res.message;
       }
+    }
+
+    function aplicarPermisosPorRol(rol) {
+      let esAdmin = (rol && rol.toString().toLowerCase() === 'admin');
+      
+      // Admin ve todo; User solo ve módulo de Buscador
+      document.getElementById('tab-calc').style.display = esAdmin ? 'block' : 'none';
+      document.getElementById('tab-ing').style.display = esAdmin ? 'block' : 'none';
+      document.getElementById('tab-sal').style.display = esAdmin ? 'block' : 'none';
+
+      cambiarPestana('buscador');
     }
 
     function cerrarSesion() {
@@ -1463,124 +1525,236 @@
       document.getElementById('msg-login').innerText = "Sesión cerrada de forma segura.";
       document.getElementById('form-ingresos').reset();
       document.getElementById('form-salidas').reset();
+      document.getElementById('busq-texto').value = '';
+      document.getElementById('busq-especifica').value = '';
+      document.getElementById('busq-val-especifico').style.display = 'none';
+      document.getElementById('tabla-head').innerHTML = '';
+      document.getElementById('tabla-body').innerHTML = '';
       clearTimeout(timerInactividad);
     }
 
     function cambiarPestana(id) {
-      document.querySelectorAll('.seccion').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      let sec = document.getElementById('sec-' + id);
-      let tab = document.getElementById('tab-' + id);
-      if(sec) sec.classList.add('active');
-      if(tab) tab.classList.add('active');
-    }
+  // 1. Ocultar todas las secciones y quitar el estado activo de todas las pestañas
+  document.querySelectorAll('.seccion').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  
+  // 2. Mostrar la sección seleccionada
+  let sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('active');
+  
+  // 3. Activar la pestaña correspondiente usando un mapa exacto
+  const mapaTabs = {
+    'calculadora': 'tab-calc',
+    'buscador': 'tab-busq',
+    'ingresos': 'tab-ing',
+    'salidas': 'tab-sal'
+  };
+  
+  let tabId = mapaTabs[id];
+  if (tabId) {
+    let tab = document.getElementById(tabId);
+    if (tab) tab.classList.add('active');
+  }
+}
 
+    // CARGA DE LISTAS DESPLEGABLES DINÁMICAS (AHORA COMO DATALIST)
     async function cargarDatosMaestros() {
       let res = await ejecutarPeticionAPI('obtenerDatosFormularios');
       datosCargados = res;
       
+      // Auto-completar Datalist Inventario
       let dl = document.getElementById('lista-inventario');
       dl.innerHTML = '';
-      if(res.inventario) {
-        res.inventario.forEach(item => {
-          let opt = document.createElement('option'); opt.value = item.nombre; dl.appendChild(opt);
-        });
-      }
+      (res.inventario || []).forEach(item => {
+        let opt = document.createElement('option'); 
+        opt.value = item.nombre; 
+        dl.appendChild(opt);
+      });
 
+      // Llenar nuevos Datalists en lugar de selects
+      llenarDatalist('lista-unidades', res.unidades || []);
+      llenarDatalist('lista-medidas', res.medidas || []);
+      llenarDatalist('lista-densidades', res.densidades || []);
+      llenarDatalist('lista-proveedores', res.proveedores || []);
+
+      // Llenar Personal RH (Se mantiene como Select porque tiene "Optgroups")
       let optionsRH = '<option value="">Seleccione...</option><optgroup label="Áreas">';
-      if(res.areas) res.areas.forEach(a => optionsRH += `<option value="${a}">${a}</option>`);
+      (res.areas || []).forEach(a => optionsRH += `<option value="${a}">${a}</option>`);
       optionsRH += '</optgroup><optgroup label="Personal">';
-      if(res.personal) res.personal.forEach(p => optionsRH += `<option value="${p}">${p}</option>`);
+      (res.personal || []).forEach(p => optionsRH += `<option value="${p}">${p}</option>`);
       optionsRH += '</optgroup>';
       
       document.getElementById('ing-entregoa').innerHTML = optionsRH;
       document.getElementById('sal-entregoa').innerHTML = optionsRH;
-
-      // Llenar selectores de unidades, grosor y proveedores
-      let optUnidades = '<option value="">Seleccione unidad...</option>';
-      if(res.unidades) res.unidades.forEach(u => optUnidades += `<option value="${u}">${u}</option>`);
-      document.getElementById('ing-unidad').innerHTML = optUnidades;
-
-      let optGrosor = '<option value="">Seleccione grosor...</option>';
-      if(res.medidas) res.medidas.forEach(m => optGrosor += `<option value="${m}">${m}</option>`);
-      document.getElementById('ing-medidas').innerHTML = optGrosor;
-
-      let optProv = '<option value="">Seleccione proveedor...</option>';
-      if(res.proveedores) res.proveedores.forEach(pr => optProv += `<option value="${pr}">${pr}</option>`);
-      document.getElementById('ing-proveedor').innerHTML = optProv;
     }
 
-    function toggleSoloDescripcion() {
-      let soloDesc = document.getElementById('ing-solo-desc').checked;
-      let campos = document.querySelectorAll('.campo-edicion');
-      campos.forEach(c => c.style.display = soloDesc ? 'none' : 'block');
-      if(soloDesc) {
-        document.getElementById('ing-tipo').required = false;
-        document.getElementById('ing-unidad').required = false;
-        document.getElementById('ing-cantidad').required = false;
-        document.getElementById('ing-precio').required = false;
-      } else {
-        document.getElementById('ing-tipo').required = true;
-        document.getElementById('ing-unidad').required = true;
-        document.getElementById('ing-cantidad').required = true;
-        document.getElementById('ing-precio').required = true;
-      }
+    // Función auxiliar para llenar <datalist>
+    function llenarDatalist(idElem, lista) {
+      let el = document.getElementById(idElem);
+      if(!el) return;
+      let html = '';
+      lista.forEach(val => html += `<option value="${val}">`);
+      el.innerHTML = html;
     }
 
+    // MÓDULO CALCULADORA
+    function agregarFilaCalculadora() {
+      let tbody = document.getElementById('calc-body');
+      let tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="number" step="0.01" class="c-a" placeholder="Pesos" oninput="calcularCalculadora(this)"></td>
+        <td><input type="number" step="0.0001" class="c-b" placeholder="Dec" oninput="calcularCalculadora(this)"></td>
+        <td><input type="number" step="0.0001" class="c-c" placeholder="Dec" oninput="calcularCalculadora(this)"></td>
+        <td><input type="number" step="0.01" class="c-d" placeholder="%" oninput="calcularCalculadora(this)"></td>
+        <td><input type="number" step="1" class="c-e" placeholder="Entero" oninput="calcularCalculadora(this)"></td>
+        <td><input type="number" class="c-f" readonly style="background:#e9ecef;"></td>
+        <td><input type="number" class="c-g" readonly style="background:#e9ecef;"></td>
+        <td><input type="number" class="c-h" readonly style="background:#e9ecef;"></td>
+        <td><input type="number" class="c-i" readonly style="background:#e9ecef; font-weight:bold;"></td>
+        <td><button class="btn btn-salir" style="padding:4px 8px; margin:0;" onclick="this.closest('tr').remove()">X</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function calcularCalculadora(elem) {
+      let tr = elem.closest('tr');
+      let a = parseFloat(tr.querySelector('.c-a').value) || 0;
+      let b = parseFloat(tr.querySelector('.c-b').value) || 0;
+      let c = parseFloat(tr.querySelector('.c-c').value) || 0;
+      let d = parseFloat(tr.querySelector('.c-d').value) || 0;
+      let e = parseFloat(tr.querySelector('.c-e').value) || 0;
+
+      // Columna 6 (Factura) = (A * C) / B
+      let f = (b !== 0) ? (a * c) / b : 0;
+      // Columna 7 (Con %) = Columna 6 * (Porcentaje / 100)
+      let g = f * (d / 100);
+      // Columna 8 (Subtotal) = Columna 6 + Columna 7
+      let h = f + g;
+      // Columna 9 (Total) = Columna 8 * Piezas (Columna 5)
+      let i = h * e;
+
+      tr.querySelector('.c-f').value = f.toFixed(2);
+      tr.querySelector('.c-g').value = g.toFixed(2);
+      tr.querySelector('.c-h').value = h.toFixed(2);
+      tr.querySelector('.c-i').value = i.toFixed(2);
+    }
+
+    // BUSCADOR MEJORADO (CON BÚSQUEDA DINÁMICA DE FOTOS Y SELECCIÓN DE HOJA)
     async function ejecutarBusqueda() {
       let texto = document.getElementById('busq-texto').value;
       if (texto.length < 3) { alert("Ingresa mínimo 3 letras."); return; }
 
-      document.getElementById('tabla-body').innerHTML = '<tr><td>Buscando...</td></tr>';
+      document.getElementById('tabla-body').innerHTML = '<tr><td>Buscando en la base de datos...</td></tr>';
       
       let res = await ejecutarPeticionAPI('buscarEnInventario', {
         texto: texto,
+        hoja: document.getElementById('busq-hoja').value, // <--- SE ENVÍA EL DATO DE LA HOJA
         filtroGeneral: document.getElementById('busq-general').value,
         filtroEspecifico: document.getElementById('busq-especifica').value,
         valorEspecifico: document.getElementById('busq-val-especifico').value
       });
 
-      let thead = ''; 
-      if(res.cabeceras) {
-        res.cabeceras.forEach(c => thead += `<th>${c}</th>`);
-        thead += `<th>Foto</th>`;
-      }
+      let thead = ''; (res.cabeceras || []).forEach(c => thead += `<th>${c}</th>`);
+      thead += '<th>Fotografía</th>';
       document.getElementById('tabla-head').innerHTML = thead;
       
       let tbody = '';
-      if (!res.data || res.data.length === 0) { tbody = '<tr><td colspan="15">Sin coincidencias</td></tr>'; } 
-      else {
+      if (!res.data || res.data.length === 0) { 
+        tbody = '<tr><td colspan="15">Sin coincidencias en esta hoja</td></tr>'; 
+      } else {
         res.data.forEach(f => {
           tbody += '<tr>';
-          f.forEach(c => tbody += `<td>${c && c.toString().includes('GMT') ? new Date(c).toLocaleDateString() : c}</td>`);
-          // Columna de Foto URL
-          let fotoUrl = f[13] || ''; // Asumiendo que la foto se guarda en columna índice 13 o equivalente
-          tbody += `<td>${fotoUrl ? `<a href="${fotoUrl}" target="_blank"><img src="${fotoUrl}" class="preview-img"></a>` : 'Sin foto'}</td>`;
+          
+          let fotoUrl = ''; 
+          
+          // Detección dinámica: buscamos celda por celda si contiene un enlace de Google Drive
+          f.forEach((c, idx) => {
+            let valorCelda = c ? c.toString() : '';
+            if (valorCelda.startsWith('http')) {
+                fotoUrl = valorCelda; // Atrapamos el link de la foto sin importar en qué columna esté
+                tbody += `<td><small style="color:#888;">[Link Adjunto]</small></td>`;
+            } else {
+                tbody += `<td>${valorCelda.includes('GMT') ? new Date(c).toLocaleDateString() : valorCelda}</td>`;
+            }
+          });
+          
+          // Renderizamos el botón al final de la fila si encontramos el enlace
+          if (fotoUrl) {
+            tbody += `<td><a href="${fotoUrl}" target="_blank" class="btn-ver-foto">Ver Foto</a></td>`;
+          } else {
+            tbody += `<td><small style="color:#888;">Sin foto</small></td>`;
+          }
           tbody += '</tr>';
         });
       }
       document.getElementById('tabla-body').innerHTML = tbody;
     }
 
+    // OPCIÓN: EDITAR ÚNICAMENTE DESCRIPCIÓN
+    function toggleEdicionDescripcion() {
+      let chk = document.getElementById('ing-chk-solo-desc').checked;
+      let reqInputs = document.querySelectorAll('.ing-req');
+      let btn = document.getElementById('btn-guardar-ing');
+// --- MODIFICACIÓN: Bloquear/Desbloquear Total y Proveedor ---
+  let inputTotal = document.getElementById('ing-precio');         // Asegúrate de que este sea el ID de tu input total
+  let inputProveedor = document.getElementById('ing-proveedor'); // Asegúrate de que este sea el ID de tu input proveedor
+let inputmedidas = document.getElementById('ing-medidas'); // Asegúrate de que este sea el ID de tu input proveedor
+     let inputdensidad = document.getElementById('ing-densidad'); // Asegúrate de que este sea el ID de tu input proveedor 
+      
+      reqInputs.forEach(i => {
+        i.required = !chk;
+        i.disabled = chk;
+      });
+
+      btn.innerText = chk ? "Actualizar Descripción Únicamente" : "Registrar Ingreso";
+    }
+
     function verificarSiExiste(prefijo) {
       let val = document.getElementById(prefijo + '-nombre').value;
-      if(!datosCargados.inventario) return;
-      let item = datosCargados.inventario.find(i => i.nombre.toLowerCase() === val.toLowerCase());
+      let item = (datosCargados.inventario || []).find(i => i.nombre.toLowerCase() === val.toLowerCase());
       
       if (prefijo === 'ing') {
         let aviso = document.getElementById('ing-aviso');
-        aviso.innerText = item ? "Producto EXISTENTE: Se sumará al stock." : "NUEVO PRODUCTO: Se creará.";
+        aviso.innerText = item ? "Producto EXISTENTE: Se sumará al stock." : "NUEVO PRODUCTO: Se creará en almacén.";
         aviso.style.color = item ? "var(--color-primario)" : "var(--color-exito)";
-      } else if (prefijo === 'sal') {
-        if (item) {
-          document.getElementById('sal-tipo').value = item.tipo || '';
-          document.getElementById('sal-unidad').value = item.unidad || '';
-        } else {
-          alert("El producto no existe."); 
-          document.getElementById('sal-nombre').value = '';
-          document.getElementById('sal-tipo').value = '';
-          document.getElementById('sal-unidad').value = '';
+
+        // Auto-completar datos si existe
+        if(item) {
+          if(item.tipo) document.getElementById('ing-tipo').value = item.tipo;
+          if(item.unidad) document.getElementById('ing-unidad').value = item.unidad;
+          if(item.medidas) document.getElementById('ing-medidas').value = item.medidas;
+          if(item.densidad) document.getElementById('ing-densidad').value = item.densidad;
         }
+      }
+    }
+
+    function cargarDatosSalida() {
+      let nombre = document.getElementById('sal-nombre').value;
+      let item = (datosCargados.inventario || []).find(i => i.nombre.toLowerCase() === nombre.toLowerCase());
+      
+      if (item) {
+        document.getElementById('sal-tipo').value = item.tipo || '';
+        document.getElementById('sal-unidad').value = item.unidad || '';
+      } else {
+        alert("El producto no existe en el inventario.");
+        document.getElementById('sal-nombre').value = '';
+        document.getElementById('sal-tipo').value = '';
+        document.getElementById('sal-unidad').value = '';
+      }
+    }
+
+    function toggleTipoAsignacion() {
+      let val = document.getElementById('sal-tipo-asig').value;
+      let divOrden = document.getElementById('div-sal-orden');
+      let inputOrden = document.getElementById('sal-orden');
+      
+      if (val === 'Orden de Producción') {
+        divOrden.style.display = 'block';
+        inputOrden.required = true;
+      } else {
+        divOrden.style.display = 'none';
+        inputOrden.required = false;
+        inputOrden.value = '';
       }
     }
 
@@ -1590,73 +1764,67 @@
       document.getElementById(prefijo + '-total').value = (c * p).toFixed(2);
     }
 
-    function cambioTipoAsignacion() {
-      let tipo = document.getElementById('sal-tipo-asignacion').value;
-      let divOrden = document.getElementById('div-orden-prod');
-      if (tipo === 'Orden de Produccion') {
-        divOrden.style.display = 'block';
-        document.getElementById('sal-orden').required = true;
-      } else {
-        divOrden.style.display = 'none';
-        document.getElementById('sal-orden').required = false;
+    // PROCESAMIENTO DE IMÁGENES A BASE64
+    function procesarFoto(inputElem, targetId) {
+      if (inputElem.files && inputElem.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById(targetId).value = e.target.result;
+        };
+        reader.readAsDataURL(inputElem.files[0]);
       }
     }
 
-    function convertirFileToBase64(fileInputId) {
-      return new Promise((resolve) => {
-        let fileInput = document.getElementById(fileInputId);
-        if (!fileInput.files || fileInput.files.length === 0) { resolve(null); return; }
-        let reader = new FileReader();
-        reader.onload = function(e) { resolve({ name: fileInput.files[0].name, data: e.target.result }); };
-        reader.readAsDataURL(fileInput.files[0]);
-      });
-    }
-
+    // TRANSACCIONES (INGRESO / SALIDA)
     async function guardarTransaccion(tipoTx) {
       let prefijo = tipoTx === 'INGRESO' ? 'ing' : 'sal';
       let nombre = document.getElementById(prefijo + '-nombre').value;
-      if (!nombre) return alert("Nombre requerido");
+      if (!nombre) return alert("El nombre del producto es obligatorio.");
 
-      let soloDesc = tipoTx === 'INGRESO' ? document.getElementById('ing-solo-desc').checked : false;
-      let fotoObj = await convertirFileToBase64(prefijo + '-foto');
+      let soloDesc = (tipoTx === 'INGRESO') && document.getElementById('ing-chk-solo-desc').checked;
 
       let datos = {
-        soloDescripcion: soloDesc,
-        tipo: document.getElementById(prefijo + '-tipo') ? document.getElementById(prefijo + '-tipo').value : document.getElementById('sal-tipo').value,
+        tipo: document.getElementById(prefijo + '-tipo') ? document.getElementById(prefijo + '-tipo').value : '',
         movimiento: tipoTx, 
         nombre: nombre,
-        unidad: document.getElementById(prefijo + '-unidad') ? document.getElementById(prefijo + '-unidad').value : document.getElementById('sal-unidad').value,
+        unidad: document.getElementById(prefijo + '-unidad') ? document.getElementById(prefijo + '-unidad').value : '',
         medidas: document.getElementById(prefijo + '-medidas') ? document.getElementById(prefijo + '-medidas').value : '',
         densidad: document.getElementById(prefijo + '-densidad') ? document.getElementById(prefijo + '-densidad').value : '',
-        cantidad: document.getElementById(prefijo + '-cantidad').value,
+        cantidad: document.getElementById(prefijo + '-cantidad') ? document.getElementById(prefijo + '-cantidad').value : 0,
         precio: document.getElementById(prefijo + '-precio') ? document.getElementById(prefijo + '-precio').value : 0,
         total: document.getElementById(prefijo + '-total') ? document.getElementById(prefijo + '-total').value : 0,
         proveedor: document.getElementById(prefijo + '-proveedor') ? document.getElementById(prefijo + '-proveedor').value : '',
         descripcion: document.getElementById(prefijo + '-descripcion').value || '',
         entregoA: document.getElementById(prefijo + '-entregoa').value,
-        foto: fotoObj,
-        esNuevo: tipoTx === 'INGRESO' ? !datosCargados.inventario.find(i => i.nombre.toLowerCase() === nombre.toLowerCase()) : false
+        fotoData: document.getElementById(prefijo + '-foto-data').value || '',
+        soloDescripcion: soloDesc,
+        esNuevo: tipoTx === 'INGRESO' ? !(datosCargados.inventario || []).find(i => i.nombre.toLowerCase() === nombre.toLowerCase()) : false
       };
 
       if (tipoTx === 'SALIDA') {
-        let tipoAsignacionVal = document.getElementById('sal-tipo-asignacion').value;
-        datos.tipoAsignacion = tipoAsignacionVal;
-        datos.ordenProd = tipoAsignacionVal === 'Orden de Produccion' ? document.getElementById('sal-orden').value : tipoAsignacionVal;
+        let tipoAsig = document.getElementById('sal-tipo-asig').value;
+        datos.ordenProd = (tipoAsig === 'Orden de Producción') ? ('OP: ' + document.getElementById('sal-orden').value) : tipoAsig;
       }
 
-      let btn = event.target; btn.disabled = true;
+      let btn = event.target; 
+      btn.disabled = true;
+      btn.innerText = "Procesando...";
+
       let res = await ejecutarPeticionAPI('procesarTransaccion', { tipoTx: tipoTx, datos: datos });
+      
       btn.disabled = false;
+      btn.innerText = tipoTx === 'INGRESO' ? (soloDesc ? "Actualizar Descripción Únicamente" : "Registrar Ingreso") : "Registrar Salida";
       
       alert(res.message);
       if (res.success) {
         document.getElementById('form-' + (tipoTx==='INGRESO'?'ingresos':'salidas')).reset();
+        document.getElementById(prefijo + '-foto-data').value = '';
         if(document.getElementById('ing-aviso')) document.getElementById('ing-aviso').innerText = '';
-        if(tipoTx === 'INGRESO') { document.getElementById('ing-solo-desc').checked = false; toggleSoloDescripcion(); }
         cargarDatosMaestros();
       }
     }
   </script>
+
 
     
 </body>
