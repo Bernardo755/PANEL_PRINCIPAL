@@ -202,6 +202,40 @@
   .pm-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
   .pm-note{font-size:11px;color:#64748b;line-height:1.45}
   @media(max-width:850px){.pm-grid{grid-template-columns:1fr}.pm-row3{grid-template-columns:1fr 1fr}.pm-row3>:first-child{grid-column:1/-1}}
+
+  /* ===== PRESENTACIÓN MEJORADA DEL PUNTO 2 ===== */
+  .pm-card-seleccion{padding:18px}
+  .pm-section-title{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px}
+  .pm-section-title h3{font-size:18px!important;margin:3px 0 5px!important}
+  .pm-step-badge{display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:4px 9px;font-size:10px;font-weight:800;letter-spacing:.5px}
+  .pm-selection-counter{white-space:nowrap;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800}
+  .pm-selection-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:11px}
+  .pm-search-wrap{flex:1 1 260px;position:relative}
+  .pm-search-wrap>span{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:19px;color:#64748b;pointer-events:none}
+  .pm-search-wrap input{width:100%;height:38px;padding:8px 12px 8px 34px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-size:13px;outline:none}
+  .pm-search-wrap input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.10)}
+  .pm-selection-help{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 1px 12px;padding:9px 11px;background:#eff6ff;border:1px solid #dbeafe;border-radius:9px;color:#475569;font-size:11px}
+  .pm-selection-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-height:390px;overflow:auto;padding:2px}
+  .pm-selection-list .pm-analysis-model{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;transition:.15s ease}
+  .pm-selection-list .pm-analysis-model:hover{border-color:#93c5fd;box-shadow:0 3px 10px rgba(15,23,42,.06)}
+  .pm-selection-list .pm-analysis-model.pm-analysis-selected{border-color:#2563eb;background:#f8fbff;box-shadow:0 0 0 2px rgba(37,99,235,.08)}
+  .pm-analysis-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-width:0}
+  .pm-analysis-check input{width:18px;height:18px;margin:2px 0 0;accent-color:#2563eb;cursor:pointer;flex:0 0 auto}
+  .pm-analysis-check>span{min-width:0}
+  .pm-analysis-check b{display:block;color:#0f172a;font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pm-analysis-check small{display:block;color:#64748b;font-size:10px;margin-top:4px}
+  .pm-analysis-controls{display:flex;align-items:center;gap:8px}
+  .pm-analysis-controls>label:first-child{display:flex;flex-direction:column;gap:4px;color:#475569;font-size:10px;font-weight:700}
+  .pm-model-cantidad{width:70px;padding:7px 8px;border:1px solid #cbd5e1;border-radius:7px;text-align:center;font-weight:700;background:#fff}
+  .pm-model-cantidad:disabled{background:#f1f5f9;color:#94a3b8}
+  .pm-prioridad-label{display:flex!important;align-items:center;gap:4px!important;white-space:nowrap;color:#475569!important;font-size:10px!important;font-weight:700}
+  .pm-model-prioridad{width:17px;height:17px;accent-color:#f59e0b;cursor:pointer}
+  .pm-model-prioridad:disabled{cursor:not-allowed}
+  .pm-selection-summary{margin-top:11px;min-height:38px;display:flex;align-items:center;padding:9px 12px;border-radius:9px;background:#f8fafc;border:1px dashed #cbd5e1;color:#475569;font-size:11px}
+  .pm-selection-summary strong{color:#0f172a}
+  .pm-selection-empty{grid-column:1/-1;padding:24px;text-align:center;border:1px dashed #cbd5e1;border-radius:10px;color:#64748b;background:#f8fafc}
+  @media(max-width:1050px){.pm-selection-list{grid-template-columns:1fr}}
+  @media(max-width:850px){.pm-section-title{flex-direction:column}.pm-selection-counter{align-self:flex-start}}
 </style>
 
 <section id="planificador-modelos-madera" class="pm-wrap">
@@ -249,13 +283,36 @@
     </div>
 
     <div>
-      <div class="pm-card">
-        <h3>2. Modelos a fabricar en este análisis</h3>
-        <div class="pm-note" style="margin-bottom:10px">
-          Selecciona uno o varios modelos. Para cada uno indica la cantidad que quieres fabricar. Puedes marcar <b>Prioritario</b>; ese modelo utilizará primero la madera disponible y después se analizarán los demás modelos con lo que vaya quedando.
+      <div class="pm-card pm-card-seleccion">
+        <div class="pm-section-title">
+          <div>
+            <div class="pm-step-badge">PASO 2</div>
+            <h3>Selecciona los modelos a fabricar</h3>
+            <div class="pm-note">Busca y selecciona uno o varios modelos. La cantidad se define aquí para este análisis y no modifica el modelo guardado.</div>
+          </div>
+          <div id="pm-seleccion-contador" class="pm-selection-counter">0 seleccionados</div>
         </div>
-        <div id="pm-seleccion-modelos" class="pm-model-list">
+
+        <div class="pm-selection-toolbar">
+          <div class="pm-search-wrap">
+            <span>⌕</span>
+            <input id="pm-buscar-modelos" type="search" placeholder="Buscar modelo..." autocomplete="off" oninput="pmFiltrarModelosAnalisis(this.value)">
+          </div>
+          <button class="pm-btn pm-btn-light" type="button" onclick="pmSeleccionarVisibles()">✓ Seleccionar visibles</button>
+          <button class="pm-btn pm-btn-light" type="button" onclick="pmLimpiarSeleccionModelos()">✕ Limpiar selección</button>
+        </div>
+
+        <div class="pm-selection-help">
+          <span>💡 <b>Prioritario:</b> será el primero en consumir la madera disponible.</span>
+          <span>📦 La cantidad de cada modelo es independiente.</span>
+        </div>
+
+        <div id="pm-seleccion-modelos" class="pm-selection-list">
           <div class="pm-note" style="padding:12px">Carga los modelos guardados para comenzar.</div>
+        </div>
+
+        <div id="pm-seleccion-resumen" class="pm-selection-summary">
+          <span>Sin modelos seleccionados</span>
         </div>
       </div>
 
@@ -479,29 +536,109 @@ function pmRenderListaModelos() {
 
 function pmRenderSeleccionModelos() {
   const cont = document.getElementById("pm-seleccion-modelos");
+  const buscar = document.getElementById("pm-buscar-modelos");
+  if (buscar) buscar.value = "";
+
   if (!pmModelosCache.length) {
-    cont.innerHTML = '<div class="pm-note" style="padding:12px">No hay modelos guardados. Crea primero un modelo en el punto 1.</div>';
+    cont.innerHTML = '<div class="pm-selection-empty">No hay modelos guardados.<br><small>Crea primero un modelo en el punto 1.</small></div>';
+    pmActualizarResumenSeleccion();
     return;
   }
+
   cont.innerHTML = pmModelosCache.map(m => `
-    <div class="pm-analysis-model" data-model-id="${pmEsc(m.id)}">
+    <div class="pm-analysis-model" data-model-id="${pmEsc(m.id)}" data-model-name="${pmEsc((m.nombre || "").toLowerCase())}">
       <label class="pm-analysis-check">
         <input type="checkbox" class="pm-model-check" data-id="${pmEsc(m.id)}" onchange="pmActualizarEstadoModeloAnalisis(this)">
         <span>
-          <b>${pmEsc(m.nombre)}</b>
-          <small>${(m.componentes || []).length} grosor(es)</small>
+          <b title="${pmEsc(m.nombre)}">${pmEsc(m.nombre)}</b>
+          <small>🪵 ${(m.componentes || []).length} grosor(es)</small>
         </span>
       </label>
       <div class="pm-analysis-controls">
         <label>Cantidad
-          <input type="number" class="pm-model-cantidad" data-id="${pmEsc(m.id)}" min="1" step="1" value="1" disabled>
+          <input type="number" class="pm-model-cantidad" data-id="${pmEsc(m.id)}" min="1" step="1" value="1" disabled oninput="pmActualizarResumenSeleccion()">
         </label>
-        <label class="pm-prioridad-label">Prioritario
-          <input type="radio" name="pm-prioridad" class="pm-model-prioridad" data-id="${pmEsc(m.id)}" disabled>
+        <label class="pm-prioridad-label" title="Este modelo consumirá primero la madera disponible">
+          ⭐ Prioritario
+          <input type="radio" name="pm-prioridad" class="pm-model-prioridad" data-id="${pmEsc(m.id)}" disabled onchange="pmActualizarResumenSeleccion()">
         </label>
       </div>
     </div>
   `).join("");
+
+  pmActualizarResumenSeleccion();
+}
+
+function pmFiltrarModelosAnalisis(valor) {
+  const termino = String(valor || "").trim().toLowerCase();
+  let visibles = 0;
+
+  document.querySelectorAll(".pm-analysis-model").forEach(card => {
+    const nombre = card.dataset.modelName || "";
+    const mostrar = !termino || nombre.includes(termino);
+    card.style.display = mostrar ? "" : "none";
+    if (mostrar) visibles++;
+  });
+
+  if (!visibles) {
+    const cont = document.getElementById("pm-seleccion-modelos");
+    let vacio = cont.querySelector(".pm-selection-empty");
+    if (!vacio) {
+      vacio = document.createElement("div");
+      vacio.className = "pm-selection-empty";
+      cont.appendChild(vacio);
+    }
+    vacio.innerHTML = `No se encontraron modelos que coincidan con <b>"${pmEsc(valor)}"</b>.`;
+  } else {
+    const vacio = document.querySelector("#pm-seleccion-modelos .pm-selection-empty");
+    if (vacio) vacio.remove();
+  }
+}
+
+function pmSeleccionarVisibles() {
+  document.querySelectorAll(".pm-analysis-model").forEach(card => {
+    if (card.style.display === "none") return;
+    const check = card.querySelector(".pm-model-check");
+    if (check && !check.checked) {
+      check.checked = true;
+      pmActualizarEstadoModeloAnalisis(check);
+    }
+  });
+  pmActualizarResumenSeleccion();
+}
+
+function pmLimpiarSeleccionModelos() {
+  document.querySelectorAll(".pm-model-check").forEach(check => {
+    check.checked = false;
+    pmActualizarEstadoModeloAnalisis(check);
+  });
+  pmActualizarResumenSeleccion();
+}
+
+function pmActualizarResumenSeleccion() {
+  const checks = Array.from(document.querySelectorAll(".pm-model-check:checked"));
+  const contador = document.getElementById("pm-seleccion-contador");
+  const resumen = document.getElementById("pm-seleccion-resumen");
+  if (!contador || !resumen) return;
+
+  contador.textContent = `${checks.length} ${checks.length === 1 ? "seleccionado" : "seleccionados"}`;
+
+  if (!checks.length) {
+    resumen.innerHTML = "<span>Sin modelos seleccionados. Selecciona los modelos que quieras fabricar.</span>";
+    return;
+  }
+
+  const datos = checks.map(ch => {
+    const card = ch.closest(".pm-analysis-model");
+    const nombre = card.querySelector(".pm-analysis-check b").textContent;
+    const cantidad = Math.max(1, parseInt(card.querySelector(".pm-model-cantidad").value) || 1);
+    const prioridad = card.querySelector(".pm-model-prioridad").checked;
+    return {nombre, cantidad, prioridad};
+  });
+
+  const prioridad = datos.find(x => x.prioridad);
+  const resumenModelos = datos.map(x => `<strong>${pmEsc(x.nombre)}</strong> × ${x.cantidad}`).join(" · ");
+  resumen.innerHTML = `📋 ${resumenModelos}${prioridad ? ` &nbsp;|&nbsp; ⭐ Primero: <strong>${pmEsc(prioridad.nombre)}</strong>` : ""}`;
 }
 
 function pmActualizarEstadoModeloAnalisis(checkbox) {
@@ -519,6 +656,7 @@ function pmActualizarEstadoModeloAnalisis(checkbox) {
     const siguiente = document.querySelector('.pm-model-check:checked');
     if (siguiente) siguiente.closest('.pm-analysis-model').querySelector('.pm-model-prioridad').checked = true;
   }
+  pmActualizarResumenSeleccion();
 }
 
 function pmObtenerModelosSeleccionados() {
