@@ -207,23 +207,19 @@
 <section id="planificador-modelos-madera" class="pm-wrap">
   <div class="pm-head">
     <h2>🪑 Planificador de Modelos y Disponibilidad de Madera</h2>
-    <p>Define tus modelos, captura la madera disponible y calcula cuántas piezas puedes fabricar.</p>
+    <p>Primero crea tus modelos, después selecciona qué modelos fabricar y finalmente captura la madera disponible para distribuirla según la prioridad.</p>
   </div>
 
   <div class="pm-grid">
     <div>
       <div class="pm-card">
-        <h3>1. Modelo de mueble</h3>
+        <h3>1. Crear / editar modelo</h3>
+        <div class="pm-note" style="margin-bottom:12px">
+          Aquí solamente se define la receta de cada modelo. <b>La cantidad a fabricar se captura en el punto 2</b>, porque puede cambiar cada vez que hagas un análisis.
+        </div>
         <div class="pm-field">
           <label for="pm-modelo">Modelo / mueble</label>
           <input id="pm-modelo" type="text" placeholder="Ej. Comedor 6 sillas">
-        </div>
-        <div class="pm-field">
-          <label for="pm-cantidad">Cantidad de piezas a realizar</label>
-          <input id="pm-cantidad" type="number" min="1" step="1" value="1">
-        </div>
-        <div class="pm-note">
-          El grosor acepta enteros y fracciones: <b>3/4</b>, <b>1 1/2</b>, <b>18</b>, etc.
         </div>
 
         <div class="pm-components">
@@ -242,7 +238,7 @@
       </div>
 
       <div class="pm-card" style="margin-top:18px">
-        <h3>2. Modelos guardados</h3>
+        <h3>Modelos guardados</h3>
         <div class="pm-actions">
           <button class="pm-btn pm-btn-light" type="button" onclick="pmCargarModelos()">↻ Actualizar</button>
         </div>
@@ -254,8 +250,18 @@
 
     <div>
       <div class="pm-card">
+        <h3>2. Modelos a fabricar en este análisis</h3>
+        <div class="pm-note" style="margin-bottom:10px">
+          Selecciona uno o varios modelos. Para cada uno indica la cantidad que quieres fabricar. Puedes marcar <b>Prioritario</b>; ese modelo utilizará primero la madera disponible y después se analizarán los demás modelos con lo que vaya quedando.
+        </div>
+        <div id="pm-seleccion-modelos" class="pm-model-list">
+          <div class="pm-note" style="padding:12px">Carga los modelos guardados para comenzar.</div>
+        </div>
+      </div>
+
+      <div class="pm-card" style="margin-top:18px">
         <h3>3. Madera disponible para este análisis</h3>
-        <div class="pm-note">La madera disponible NO se guarda en la base de datos. Cada análisis usa únicamente lo que captures aquí.</div>
+        <div class="pm-note">La madera disponible <b>NO se guarda</b> en la base de datos. Debes capturarla en cada análisis. Se puede capturar más de un registro del mismo grosor y el sistema los acumulará.</div>
 
         <div class="pm-components">
           <table>
@@ -266,14 +272,14 @@
 
         <div class="pm-actions">
           <button class="pm-btn pm-btn-blue" type="button" onclick="pmAgregarMadera()">+ Grosor disponible</button>
-          <button class="pm-btn pm-btn-primary" type="button" onclick="pmAnalizar()">🔎 Analizar</button>
+          <button class="pm-btn pm-btn-primary" type="button" onclick="pmAnalizar()">🔎 Analizar distribución</button>
           <button class="pm-btn pm-btn-light" type="button" onclick="pmLimpiarMadera()">Limpiar madera</button>
         </div>
       </div>
 
       <div class="pm-card" style="margin-top:18px">
-        <h3>4. Resultado</h3>
-        <div id="pm-resultado" class="pm-note">Selecciona un modelo y captura la madera disponible para ejecutar el análisis.</div>
+        <h3>4. Resultado del análisis</h3>
+        <div id="pm-resultado" class="pm-note">Selecciona los modelos, indica las cantidades, captura la madera disponible y pulsa <b>Analizar distribución</b>.</div>
       </div>
     </div>
   </div>
@@ -282,8 +288,11 @@
 <script>
 /* =========================================================
    PLANIFICADOR DE MODELOS Y MADERA
+   La cantidad de piezas pertenece al ANALISIS, no al modelo guardado.
    ========================================================= */
-const URL_MODELOS_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbydzPwyiPW7YRL35DfmuHQlDRku7TqPab1yuhPfj9PV4tFodghFK45_nXASa1WXxi14/exec";
+const CONFIG_PLANIFICADOR_MADERA = {
+  URL_APPS_SCRIPT: "https://script.google.com/macros/s/AKfycbydzPwyiPW7YRL35DfmuHQlDRku7TqPab1yuhPfj9PV4tFodghFK45_nXASa1WXxi14/exec"
+};
 
 let pmModeloEditandoId = null;
 let pmModelosCache = [];
@@ -316,6 +325,26 @@ function pmGrosorEnPulgadas(valor, unidad) {
 
 function pmFormatoPT(n) {
   return Number(n || 0).toFixed(2);
+}
+
+function pmFormatoGrosor(inches) {
+  const n = Number(inches || 0);
+  if (!isFinite(n)) return "0 in";
+  const entero = Math.floor(n);
+  const frac = n - entero;
+  const denominadores = [2,4,8,16,32,64];
+  let mejorNum = 0, mejorDen = 1, mejorDif = Infinity;
+  denominadores.forEach(d => {
+    const num = Math.round(frac * d);
+    const dif = Math.abs(frac - num / d);
+    if (dif < mejorDif) { mejorDif = dif; mejorNum = num; mejorDen = d; }
+  });
+  if (mejorNum === 0) return `${entero || 0} in`;
+  if (mejorNum === mejorDen) return `${entero + 1} in`;
+  const divisor = (a,b) => b ? divisor(b, a % b) : a;
+  const g = divisor(mejorNum, mejorDen);
+  mejorNum /= g; mejorDen /= g;
+  return `${entero ? entero + " " : ""}${mejorNum}/${mejorDen} in`;
 }
 
 function pmAgregarComponente(datos = null) {
@@ -369,9 +398,7 @@ function pmLeerComponentes() {
     const unidad = tr.querySelector(".pm-comp-unidad").value;
     const ptPorPieza = parseFloat(tr.querySelector(".pm-comp-pt").value) || 0;
     const grosorIn = pmGrosorEnPulgadas(grosor, unidad);
-    if (grosorIn > 0 && ptPorPieza > 0) {
-      componentes.push({grosor, unidad, grosorIn, ptPorPieza});
-    }
+    if (grosorIn > 0 && ptPorPieza > 0) componentes.push({grosor, unidad, grosorIn, ptPorPieza});
   });
   return componentes;
 }
@@ -383,9 +410,7 @@ function pmLeerMaderaDisponible() {
     const unidad = tr.querySelector(".pm-mad-unidad").value;
     const ptDisponible = parseFloat(tr.querySelector(".pm-mad-pt").value) || 0;
     const grosorIn = pmGrosorEnPulgadas(grosor, unidad);
-    if (grosorIn > 0 && ptDisponible > 0) {
-      madera.push({grosor, unidad, grosorIn, ptDisponible});
-    }
+    if (grosorIn > 0 && ptDisponible > 0) madera.push({grosor, unidad, grosorIn, ptDisponible});
   });
   return madera;
 }
@@ -407,209 +432,264 @@ function pmBuscarModelo(id) {
 async function pmGuardarModelo() {
   const nombre = document.getElementById("pm-modelo").value.trim();
   const componentes = pmLeerComponentes();
-
   if (!nombre) return alert("Ingresa el nombre del modelo.");
   if (!componentes.length) return alert("Agrega al menos un grosor con PT por pieza.");
 
   const msg = document.getElementById("pm-modelo-msg");
   msg.textContent = "Guardando modelo...";
-
   try {
-    const r = await pmApi({
-      action:"guardarModelo",
-      modelo:{id:pmModeloEditandoId, nombre, componentes}
-    });
+    const r = await pmApi({action:"guardarModelo", modelo:{id:pmModeloEditandoId, nombre, componentes}});
     if (!r.success) throw new Error(r.message || "No se pudo guardar.");
     pmModeloEditandoId = r.id;
     msg.textContent = "✅ Modelo guardado correctamente.";
     await pmCargarModelos();
-  } catch(e) {
-    msg.textContent = "❌ " + e.message;
-  }
+  } catch(e) { msg.textContent = "❌ " + e.message; }
 }
 
 async function pmCargarModelos() {
   const cont = document.getElementById("pm-lista-modelos");
   cont.innerHTML = '<div class="pm-note" style="padding:12px">Cargando modelos...</div>';
-
   try {
     const r = await pmApi({action:"listarModelos"});
     if (!r.success) throw new Error(r.message || "Error al cargar modelos.");
     pmModelosCache = r.modelos || [];
-
-    if (!pmModelosCache.length) {
-      cont.innerHTML = '<div class="pm-note" style="padding:12px">No hay modelos guardados.</div>';
-      return;
-    }
-
-    cont.innerHTML = pmModelosCache.map(m => `
-      <div class="pm-model-item">
-        <div>
-          <div class="pm-model-name">${pmEsc(m.nombre)}</div>
-          <div class="pm-model-meta">${(m.componentes || []).length} grosor(es)</div>
-        </div>
-        <button class="pm-btn pm-btn-blue" type="button" onclick="pmSeleccionarModelo('${pmEscJS(m.id)}')">Seleccionar</button>
-      </div>
-    `).join("");
+    pmRenderListaModelos();
+    pmRenderSeleccionModelos();
   } catch(e) {
     cont.innerHTML = `<div class="pm-note" style="padding:12px">❌ ${pmEsc(e.message)}</div>`;
   }
 }
 
-function pmSeleccionarModelo(id) {
+function pmRenderListaModelos() {
+  const cont = document.getElementById("pm-lista-modelos");
+  if (!pmModelosCache.length) {
+    cont.innerHTML = '<div class="pm-note" style="padding:12px">No hay modelos guardados.</div>';
+    return;
+  }
+  cont.innerHTML = pmModelosCache.map(m => `
+    <div class="pm-model-item">
+      <div>
+        <div class="pm-model-name">${pmEsc(m.nombre)}</div>
+        <div class="pm-model-meta">${(m.componentes || []).length} grosor(es)</div>
+      </div>
+      <button class="pm-btn pm-btn-blue" type="button" onclick="pmEditarModelo('${pmEscJS(m.id)}')">Editar</button>
+    </div>
+  `).join("");
+}
+
+function pmRenderSeleccionModelos() {
+  const cont = document.getElementById("pm-seleccion-modelos");
+  if (!pmModelosCache.length) {
+    cont.innerHTML = '<div class="pm-note" style="padding:12px">No hay modelos guardados. Crea primero un modelo en el punto 1.</div>';
+    return;
+  }
+  cont.innerHTML = pmModelosCache.map(m => `
+    <div class="pm-analysis-model" data-model-id="${pmEsc(m.id)}">
+      <label class="pm-analysis-check">
+        <input type="checkbox" class="pm-model-check" data-id="${pmEsc(m.id)}" onchange="pmActualizarEstadoModeloAnalisis(this)">
+        <span>
+          <b>${pmEsc(m.nombre)}</b>
+          <small>${(m.componentes || []).length} grosor(es)</small>
+        </span>
+      </label>
+      <div class="pm-analysis-controls">
+        <label>Cantidad
+          <input type="number" class="pm-model-cantidad" data-id="${pmEsc(m.id)}" min="1" step="1" value="1" disabled>
+        </label>
+        <label class="pm-prioridad-label">Prioritario
+          <input type="radio" name="pm-prioridad" class="pm-model-prioridad" data-id="${pmEsc(m.id)}" disabled>
+        </label>
+      </div>
+    </div>
+  `).join("");
+}
+
+function pmActualizarEstadoModeloAnalisis(checkbox) {
+  const id = checkbox.dataset.id;
+  const card = document.querySelector(`.pm-analysis-model[data-model-id="${CSS.escape(id)}"]`);
+  if (!card) return;
+  const cantidad = card.querySelector(".pm-model-cantidad");
+  const prioridad = card.querySelector(".pm-model-prioridad");
+  cantidad.disabled = !checkbox.checked;
+  prioridad.disabled = !checkbox.checked;
+  card.classList.toggle("pm-analysis-selected", checkbox.checked);
+  if (checkbox.checked && !document.querySelector('.pm-model-prioridad:checked')) prioridad.checked = true;
+  if (!checkbox.checked && prioridad.checked) {
+    prioridad.checked = false;
+    const siguiente = document.querySelector('.pm-model-check:checked');
+    if (siguiente) siguiente.closest('.pm-analysis-model').querySelector('.pm-model-prioridad').checked = true;
+  }
+}
+
+function pmObtenerModelosSeleccionados() {
+  return Array.from(document.querySelectorAll('.pm-model-check:checked')).map(ch => {
+    const card = ch.closest('.pm-analysis-model');
+    return {
+      modelo: pmBuscarModelo(ch.dataset.id),
+      cantidad: Math.max(1, parseInt(card.querySelector('.pm-model-cantidad').value) || 1),
+      prioritario: card.querySelector('.pm-model-prioridad').checked
+    };
+  }).filter(x => x.modelo);
+}
+
+function pmEditarModelo(id) {
   const modelo = pmBuscarModelo(id);
   if (!modelo) return;
-
   pmModeloEditandoId = modelo.id;
   document.getElementById("pm-modelo").value = modelo.nombre || "";
   document.getElementById("pm-componentes").innerHTML = "";
   (modelo.componentes || []).forEach(c => pmAgregarComponente(c));
-
-  document.getElementById("pm-resultado").innerHTML =
-    `<div class="pm-info pm-result-box">Modelo seleccionado: <b>${pmEsc(modelo.nombre)}</b>. Captura la madera disponible y pulsa <b>Analizar</b>.</div>`;
+  document.getElementById("pm-modelo-msg").textContent = "Modelo cargado para edición. La cantidad se define en el punto 2.";
 }
 
 function pmLimpiarModelo() {
   pmModeloEditandoId = null;
   document.getElementById("pm-modelo").value = "";
-  document.getElementById("pm-cantidad").value = 1;
   document.getElementById("pm-componentes").innerHTML = "";
-  pmAgregarComponente();
   document.getElementById("pm-modelo-msg").textContent = "";
+  pmAgregarComponente();
 }
 
 function pmLimpiarMadera() {
   document.getElementById("pm-madera-disponible").innerHTML = "";
   pmAgregarMadera();
-  document.getElementById("pm-resultado").innerHTML =
-    '<div class="pm-note">Captura nuevamente la madera disponible para realizar otro análisis.</div>';
+  document.getElementById("pm-resultado").innerHTML = '<div class="pm-note">Captura nuevamente la madera disponible para realizar otro análisis.</div>';
+}
+
+function pmLimpiarMapa(mapa) {
+  const salida = {};
+  Object.keys(mapa).forEach(k => salida[k] = {grosorIn:mapa[k].grosorIn, pt:Math.max(0, Number(mapa[k].pt)||0)});
+  return salida;
+}
+
+function pmComponentesAgrupados(modelo) {
+  const agrupados = {};
+  (modelo.componentes || []).forEach(c => {
+    const grosorIn = Number(c.grosorIn);
+    const k = grosorIn.toFixed(4);
+    if (!agrupados[k]) agrupados[k] = {grosorIn, ptPorPieza:0};
+    agrupados[k].ptPorPieza += Number(c.ptPorPieza) || 0;
+  });
+  return Object.values(agrupados);
 }
 
 function pmCalcularMaxPiezas(modelo, maderaMapa) {
   let maximo = Infinity;
-  const agrupados = {};
-
-  (modelo.componentes || []).forEach(c => {
-    const k = Number(c.grosorIn).toFixed(4);
-    if (!agrupados[k]) {
-      agrupados[k] = {grosorIn:Number(c.grosorIn), ptPorPieza:0};
-    }
-    agrupados[k].ptPorPieza += Number(c.ptPorPieza) || 0;
-  });
-
-  const detalle = Object.values(agrupados).map(c => {
+  const detalle = pmComponentesAgrupados(modelo).map(c => {
     const k = c.grosorIn.toFixed(4);
-    const disponible = maderaMapa[k] ? maderaMapa[k].pt : 0;
-    const posibles = c.ptPorPieza > 0
-      ? Math.floor((disponible + 1e-9) / c.ptPorPieza)
-      : 0;
+    const disponible = maderaMapa[k] ? Number(maderaMapa[k].pt) : 0;
+    const posibles = c.ptPorPieza > 0 ? Math.floor((disponible + 1e-9) / c.ptPorPieza) : 0;
     maximo = Math.min(maximo, posibles);
     return {grosorIn:c.grosorIn, ptPorPieza:c.ptPorPieza, disponible, posibles};
   });
-
   if (maximo === Infinity) maximo = 0;
   return {maximo, detalle};
 }
 
 function pmRestarMadera(mapa, modelo, piezas) {
-  const restante = {};
-  Object.keys(mapa).forEach(k => restante[k] = {...mapa[k]});
-
-  (modelo.componentes || []).forEach(c => {
-    const k = Number(c.grosorIn).toFixed(4);
-    if (restante[k]) {
-      restante[k].pt = Math.max(0, restante[k].pt - Number(c.ptPorPieza) * piezas);
-    }
+  const restante = pmLimpiarMapa(mapa);
+  pmComponentesAgrupados(modelo).forEach(c => {
+    const k = c.grosorIn.toFixed(4);
+    if (restante[k]) restante[k].pt = Math.max(0, restante[k].pt - c.ptPorPieza * piezas);
   });
   return restante;
 }
 
+function pmMaderaTotal(mapa) {
+  return Object.values(mapa).reduce((a,x) => a + Number(x.pt || 0), 0);
+}
+
 function pmAnalizar() {
-  const modeloId = pmModeloEditandoId || (pmModelosCache.length === 1 ? pmModelosCache[0].id : null);
-  const modelo = pmBuscarModelo(modeloId);
+  const seleccionados = pmObtenerModelosSeleccionados();
+  if (!seleccionados.length) return alert("Selecciona al menos un modelo en el punto 2 e indica la cantidad a fabricar.");
 
-  if (!modelo) return alert("Selecciona primero un modelo guardado.");
-
-  const cantidadSolicitada = Math.max(1, parseInt(document.getElementById("pm-cantidad").value) || 1);
   const madera = pmLeerMaderaDisponible();
+  if (!madera.length) return alert("Ingresa la madera disponible por grosor en el punto 3.");
 
-  if (!madera.length) return alert("Ingresa la madera disponible por grosor.");
+  const prioridad = seleccionados.find(x => x.prioritario);
+  const orden = prioridad
+    ? [prioridad, ...seleccionados.filter(x => String(x.modelo.id) !== String(prioridad.modelo.id))]
+    : seleccionados;
 
-  const mapaInicial = pmAgruparMadera(madera);
-  const calculo = pmCalcularMaxPiezas(modelo, mapaInicial);
-  const piezasPosibles = Math.min(calculo.maximo, cantidadSolicitada);
-  const restante = pmRestarMadera(mapaInicial, modelo, piezasPosibles);
+  let disponible = pmAgruparMadera(madera);
+  const resultados = [];
 
-  const faltantes = calculo.detalle
-    .filter(d => d.posibles < cantidadSolicitada)
-    .map(d => ({
-      ...d,
-      necesarioTotal:d.ptPorPieza * cantidadSolicitada,
-      faltante:Math.max(0, d.ptPorPieza * cantidadSolicitada - d.disponible)
+  orden.forEach(item => {
+    const antes = pmLimpiarMapa(disponible);
+    const calculo = pmCalcularMaxPiezas(item.modelo, antes);
+    const fabricables = Math.min(item.cantidad, calculo.maximo);
+    const despues = pmRestarMadera(antes, item.modelo, fabricables);
+    const faltantes = calculo.detalle.filter(d => d.posibles < item.cantidad).map(d => ({
+      grosorIn:d.grosorIn,
+      faltante:Math.max(0, d.ptPorPieza * item.cantidad - d.disponible)
     }));
 
-  const sobrantes = Object.values(restante).filter(x => x.pt > 0.0001);
+    resultados.push({
+      ...item,
+      calculo,
+      fabricables,
+      faltantes,
+      maderaAntes:antes,
+      maderaDespues:despues
+    });
+    disponible = despues;
+  });
+
+  const seleccionadosIds = new Set(seleccionados.map(x => String(x.modelo.id)));
+  const noSeleccionados = pmModelosCache.filter(m => !seleccionadosIds.has(String(m.id)));
+  const sobranteFinal = pmLimpiarMapa(disponible);
+  const sobranteTotal = pmMaderaTotal(sobranteFinal);
 
   let html = `
-    <div class="${piezasPosibles >= cantidadSolicitada ? "pm-ok" : "pm-warn"} pm-result-box">
-      <div style="font-size:18px;font-weight:800">
-        ${piezasPosibles >= cantidadSolicitada ? "✅ Madera suficiente" : "⚠️ Madera insuficiente"}
-      </div>
-      <div style="margin-top:5px">
-        Para <b>${cantidadSolicitada}</b> pieza(s) de <b>${pmEsc(modelo.nombre)}</b>,
-        puedes fabricar <b>${piezasPosibles}</b> pieza(s).
-      </div>
-    </div>
-
     <div class="pm-result-box pm-info">
-      <b>Detalle por grosor</b>
-      <table class="pm-results" style="margin-top:8px">
-        <thead><tr><th>Grosor</th><th>PT/pieza</th><th>PT requerido</th><th>PT disponible</th><th>PT restante</th></tr></thead>
-        <tbody>
-          ${calculo.detalle.map(d => {
-            const consumido = d.ptPorPieza * piezasPosibles;
-            const rest = Math.max(0, d.disponible - consumido);
-            return `<tr>
-              <td>${d.grosorIn.toFixed(4)} in</td>
-              <td>${pmFormatoPT(d.ptPorPieza)}</td>
-              <td>${pmFormatoPT(d.ptPorPieza * cantidadSolicitada)}</td>
-              <td>${pmFormatoPT(d.disponible)}</td>
-              <td><b>${pmFormatoPT(rest)}</b></td>
-            </tr>`;
-          }).join("")}
-        </tbody>
-      </table>
+      <b>Orden de distribución de la madera</b>
+      <div style="margin-top:5px">${resultados.map((r,i) => `${i+1}. <b>${pmEsc(r.modelo.nombre)}</b>${r.prioritario ? ' ⭐ Prioritario' : ''} — solicitado: ${r.cantidad}`).join('<br>')}</div>
     </div>`;
 
-  if (faltantes.length) {
+  resultados.forEach(r => {
+    const completo = r.fabricables >= r.cantidad;
     html += `
-      <div class="pm-result-box pm-bad">
-        <b>Falta para completar las ${cantidadSolicitada} piezas solicitadas:</b>
-        <ul style="margin:8px 0 0 18px">
-          ${faltantes.map(f => `<li>${f.grosorIn.toFixed(4)} in: faltan <b>${pmFormatoPT(f.faltante)} PT</b>.</li>`).join("")}
-        </ul>
-      </div>`;
-  }
-
-  if (sobrantes.length) {
-    const noSeleccionados = pmModelosCache.filter(m => String(m.id) !== String(modelo.id));
-    html += `
-      <div class="pm-result-box pm-warn">
-        <b>Madera sobrante y equivalencia para otros modelos</b>
-        <table class="pm-results" style="margin-top:8px">
-          <thead><tr><th>Grosor sobrante</th><th>PT sobrante</th></tr></thead>
+      <div class="pm-result-box ${completo ? 'pm-ok' : 'pm-warn'}">
+        <div style="font-size:17px;font-weight:800">${completo ? '✅' : '⚠️'} ${pmEsc(r.modelo.nombre)} ${r.prioritario ? '⭐' : ''}</div>
+        <div style="margin-top:5px">Solicitadas: <b>${r.cantidad}</b> · Se pueden fabricar: <b>${r.fabricables}</b></div>
+        <div style="margin-top:8px">Madera restante después de este modelo:</div>
+        <table class="pm-results" style="margin-top:6px">
+          <thead><tr><th>Grosor</th><th>PT antes</th><th>PT consumido</th><th>PT después</th></tr></thead>
           <tbody>
-            ${sobrantes.map(s => `<tr><td>${s.grosorIn.toFixed(4)} in</td><td>${pmFormatoPT(s.pt)} PT</td></tr>`).join("")}
+            ${r.calculo.detalle.map(d => {
+              const antes = d.disponible;
+              const consumido = d.ptPorPieza * r.fabricables;
+              const despues = Math.max(0, antes - consumido);
+              return `<tr><td>${pmFormatoGrosor(d.grosorIn)}</td><td>${pmFormatoPT(antes)}</td><td>${pmFormatoPT(consumido)}</td><td><b>${pmFormatoPT(despues)}</b></td></tr>`;
+            }).join('')}
           </tbody>
         </table>
-        <div style="margin-top:10px">
-          ${noSeleccionados.length ? noSeleccionados.map(otro => {
-            const c = pmCalcularMaxPiezas(otro, restante);
-            return `<div style="padding:7px 0;border-bottom:1px solid #fde68a">
-              <b>${pmEsc(otro.nombre)}</b>: alcanza para <b>${c.maximo}</b> pieza(s) completas con la madera sobrante.
-            </div>`;
-          }).join("") : '<div class="pm-note">No existen otros modelos guardados para comparar.</div>'}
-        </div>
+        ${r.faltantes.length ? `<div style="margin-top:8px"><b>Para cumplir la cantidad solicitada faltaría:</b><ul style="margin:5px 0 0 18px">${r.faltantes.map(f => `<li>${pmFormatoGrosor(f.grosorIn)}: ${pmFormatoPT(f.faltante)} PT</li>`).join('')}</ul></div>` : ''}
+      </div>`;
+  });
+
+  html += `
+    <div class="pm-result-box ${sobranteTotal > 0.0001 ? 'pm-warn' : 'pm-ok'}">
+      <b>📦 Madera sobrante al terminar todos los modelos seleccionados</b>
+      ${sobranteTotal > 0.0001 ? `
+        <table class="pm-results" style="margin-top:8px">
+          <thead><tr><th>Grosor</th><th>PT sobrante</th></tr></thead>
+          <tbody>${Object.values(sobranteFinal).filter(x => x.pt > 0.0001).map(x => `<tr><td>${pmFormatoGrosor(x.grosorIn)}</td><td><b>${pmFormatoPT(x.pt)} PT</b></td></tr>`).join('')}</tbody>
+        </table>` : '<div style="margin-top:5px">No queda madera disponible en los grosores analizados.</div>'}
+    </div>`;
+
+  if (noSeleccionados.length && sobranteTotal > 0.0001) {
+    html += `
+      <div class="pm-result-box pm-info">
+        <b>🔄 ¿Para cuántas piezas alcanzaría la madera sobrante de otros modelos no seleccionados?</b>
+        <div class="pm-note" style="margin-top:5px">Estas cantidades son una comparación independiente: no se descuenta madera de estas alternativas.</div>
+        <table class="pm-results" style="margin-top:8px">
+          <thead><tr><th>Modelo</th><th>Máximo con el sobrante</th></tr></thead>
+          <tbody>${noSeleccionados.map(m => {
+            const c = pmCalcularMaxPiezas(m, sobranteFinal);
+            return `<tr><td><b>${pmEsc(m.nombre)}</b></td><td>${c.maximo} pieza(s)</td></tr>`;
+          }).join('')}</tbody>
+        </table>
       </div>`;
   }
 
@@ -617,7 +697,7 @@ function pmAnalizar() {
 }
 
 async function pmApi(payload) {
-  const res = await fetch(URL_MODELOS_APPS_SCRIPT, {
+  const res = await fetch(CONFIG_PLANIFICADOR_MADERA.URL_APPS_SCRIPT, {
     method:"POST",
     mode:"cors",
     headers:{"Content-Type":"text/plain;charset=utf-8"},
@@ -633,7 +713,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-        <div class="instructions" style="margin-top: 15px;">
+<div class="instructions" style="margin-top: 15px;">
          <!DOCTYPE html>
 <html lang="es">
 <head>
