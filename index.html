@@ -230,21 +230,23 @@
   .pm-search-wrap input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.10)}
   .pm-selection-help{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 1px 12px;padding:9px 11px;background:#eff6ff;border:1px solid #dbeafe;border-radius:9px;color:#475569;font-size:11px}
   .pm-selection-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-height:390px;overflow:auto;padding:2px}
-  .pm-selection-list .pm-analysis-model{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:13px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;transition:.15s ease;min-height:76px}
+  .pm-selection-list .pm-analysis-model{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:stretch;padding:13px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;transition:.15s ease;min-width:0}
   .pm-selection-list .pm-analysis-model:hover{border-color:#93c5fd;box-shadow:0 3px 10px rgba(15,23,42,.06)}
-  .pm-selection-list .pm-analysis-model.pm-analysis-selected{border-color:#2563eb;background:#f8fbff;box-shadow:0 0 0 2px rgba(37,99,235,.08)}
-  .pm-analysis-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-width:0}
-  .pm-analysis-check input{width:18px;height:18px;margin:2px 0 0;accent-color:#2563eb;cursor:pointer;flex:0 0 auto}
-  .pm-analysis-check>span{min-width:0}
-  .pm-analysis-check b{display:block;color:#0f172a;font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pm-selection-list .pm-analysis-model.pm-analysis-selected{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 2px rgba(37,99,235,.10)}
+  .pm-analysis-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-width:0;width:100%;padding:2px 2px 9px;border-bottom:1px solid #e5e7eb}
+  .pm-analysis-check input{width:19px;height:19px;margin:1px 0 0;accent-color:#2563eb;cursor:pointer;flex:0 0 auto}
+  .pm-analysis-check>span{min-width:0;flex:1}
+  .pm-analysis-check b{display:block;color:#0f172a;font-size:13px;line-height:1.35;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word}
+  .pm-analysis-selected .pm-analysis-check b{color:#1d4ed8}
   .pm-analysis-check small{display:block;color:#64748b;font-size:10px;margin-top:4px}
-  .pm-analysis-controls{display:flex;align-items:center;gap:8px}
-  .pm-analysis-controls>label:first-child{display:flex;flex-direction:column;gap:4px;color:#475569;font-size:10px;font-weight:700}
-  .pm-model-cantidad{width:70px;padding:7px 8px;border:1px solid #cbd5e1;border-radius:7px;text-align:center;font-weight:700;background:#fff}
+  .pm-analysis-controls{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;width:100%;padding:1px 2px 0}
+  .pm-analysis-controls>label:first-child{display:flex;flex-direction:row;align-items:center;gap:6px;color:#475569;font-size:11px;font-weight:700;margin:0}
+  .pm-model-cantidad{width:74px;padding:7px 8px;border:1px solid #cbd5e1;border-radius:7px;text-align:center;font-weight:700;background:#fff}
   .pm-model-cantidad:disabled{background:#f1f5f9;color:#94a3b8}
-  .pm-prioridad-label{display:flex!important;align-items:center;gap:4px!important;white-space:nowrap;color:#475569!important;font-size:10px!important;font-weight:700}
-  .pm-model-prioridad{width:17px;height:17px;accent-color:#f59e0b;cursor:pointer}
-  .pm-model-prioridad:disabled{cursor:not-allowed}
+  .pm-prioridad-label{display:flex!important;align-items:center;gap:6px!important;white-space:nowrap;color:#475569!important;font-size:11px!important;font-weight:700;margin:0!important}
+  .pm-model-prioridad{display:inline-flex;align-items:center;justify-content:center;min-width:27px;height:27px;padding:0 7px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-size:12px;font-weight:900}
+  .pm-analysis-model:not(.pm-analysis-selected) .pm-model-prioridad{background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0}
+  @media(max-width:520px){.pm-analysis-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pm-analysis-controls>label:first-child{justify-content:space-between}.pm-prioridad-label{justify-content:space-between}}
   .pm-selection-summary{margin-top:11px;min-height:38px;display:flex;align-items:center;padding:9px 12px;border-radius:9px;background:#f8fafc;border:1px dashed #cbd5e1;color:#475569;font-size:11px}
   .pm-selection-summary strong{color:#0f172a}
   .pm-selection-empty{grid-column:1/-1;padding:24px;text-align:center;border:1px dashed #cbd5e1;border-radius:10px;color:#64748b;background:#f8fafc}
@@ -365,8 +367,10 @@ const CONFIG_PLANIFICADOR_MADERA = {
   URL_APPS_SCRIPT: "https://script.google.com/macros/s/AKfycbydzPwyiPW7YRL35DfmuHQlDRku7TqPab1yuhPfj9PV4tFodghFK45_nXASa1WXxi14/exec"
 };
 
-let pmModeloEditandoId = null;
-let pmModelosCache = [];
+var pmModeloEditandoId = null;
+var pmModelosCache = [];
+var pmOrdenSeleccion = window.pmOrdenSeleccion || [];
+window.pmOrdenSeleccion = pmOrdenSeleccion;
 
 function pmProcesarFraccion(valor) {
   if (valor === null || valor === undefined) return 0;
@@ -553,6 +557,9 @@ function pmRenderSeleccionModelos() {
   const buscar = document.getElementById("pm-buscar-modelos");
   if (buscar) buscar.value = "";
 
+  pmOrdenSeleccion = [];
+  window.pmOrdenSeleccion = pmOrdenSeleccion;
+
   if (!pmModelosCache.length) {
     cont.innerHTML = '<div class="pm-selection-empty">No hay modelos guardados.<br><small>Crea primero un modelo en el punto 1.</small></div>';
     pmActualizarResumenSeleccion();
@@ -560,7 +567,7 @@ function pmRenderSeleccionModelos() {
   }
 
   cont.innerHTML = pmModelosCache.map(m => `
-    <div class="pm-analysis-model" data-model-id="${pmEsc(m.id)}" data-model-name="${pmEsc((m.nombre || "").toLowerCase())}">
+    <div class="pm-analysis-model" data-model-id="${pmEsc(m.id)}" data-model-name="${pmEsc((m.nombre || "").toLowerCase())}" data-priority="">
       <label class="pm-analysis-check">
         <input type="checkbox" class="pm-model-check" data-id="${pmEsc(m.id)}" onchange="pmActualizarEstadoModeloAnalisis(this)">
         <span>
@@ -572,9 +579,9 @@ function pmRenderSeleccionModelos() {
         <label>Cantidad
           <input type="number" class="pm-model-cantidad" data-id="${pmEsc(m.id)}" min="1" step="1" value="1" disabled oninput="pmActualizarResumenSeleccion()">
         </label>
-        <label class="pm-prioridad-label" title="Este modelo consumirá primero la madera disponible">
-          ⭐ Prioritario
-          <input type="radio" name="pm-prioridad" class="pm-model-prioridad" data-id="${pmEsc(m.id)}" disabled onchange="pmActualizarResumenSeleccion()">
+        <label class="pm-prioridad-label" title="Orden en que se distribuirá la madera a los modelos seleccionados">
+          Prioridad
+          <span class="pm-model-prioridad" data-id="${pmEsc(m.id)}">—</span>
         </label>
       </div>
     </div>
@@ -626,10 +633,47 @@ function pmLimpiarSeleccionModelos() {
     check.checked = false;
     pmActualizarEstadoModeloAnalisis(check);
   });
+  pmOrdenSeleccion = [];
+  window.pmOrdenSeleccion = pmOrdenSeleccion;
   pmActualizarResumenSeleccion();
 }
 
+function pmRenumerarPrioridades() {
+  const seleccionados = pmOrdenSeleccion.filter(id => {
+    const ch = document.querySelector(`.pm-model-check[data-id="${CSS.escape(String(id))}"]`);
+    return ch && ch.checked;
+  });
+  pmOrdenSeleccion = seleccionados;
+  window.pmOrdenSeleccion = pmOrdenSeleccion;
+
+  document.querySelectorAll(".pm-analysis-model").forEach(card => {
+    const id = String(card.dataset.modelId);
+    const pos = pmOrdenSeleccion.indexOf(id);
+    const badge = card.querySelector(".pm-model-prioridad");
+    card.dataset.priority = pos >= 0 ? String(pos + 1) : "";
+    if (badge) badge.textContent = pos >= 0 ? String(pos + 1) : "—";
+  });
+}
+
+function pmRenumerarPrioridades() {
+  const seleccionados = pmOrdenSeleccion.filter(id => {
+    const ch = document.querySelector(`.pm-model-check[data-id="${CSS.escape(String(id))}"]`);
+    return ch && ch.checked;
+  });
+  pmOrdenSeleccion = seleccionados;
+  window.pmOrdenSeleccion = pmOrdenSeleccion;
+
+  document.querySelectorAll(".pm-analysis-model").forEach(card => {
+    const id = String(card.dataset.modelId);
+    const pos = pmOrdenSeleccion.indexOf(id);
+    const badge = card.querySelector(".pm-model-prioridad");
+    card.dataset.priority = pos >= 0 ? String(pos + 1) : "";
+    if (badge) badge.textContent = pos >= 0 ? String(pos + 1) : "—";
+  });
+}
+
 function pmActualizarResumenSeleccion() {
+  pmRenumerarPrioridades();
   const checks = Array.from(document.querySelectorAll(".pm-model-check:checked"));
   const contador = document.getElementById("pm-seleccion-contador");
   const resumen = document.getElementById("pm-seleccion-resumen");
@@ -642,45 +686,55 @@ function pmActualizarResumenSeleccion() {
     return;
   }
 
-  const datos = checks.map(ch => {
+  const datos = pmOrdenSeleccion.map((id, index) => {
+    const ch = document.querySelector(`.pm-model-check[data-id="${CSS.escape(String(id))}"]`);
+    if (!ch || !ch.checked) return null;
     const card = ch.closest(".pm-analysis-model");
-    const nombre = card.querySelector(".pm-analysis-check b").textContent;
-    const cantidad = Math.max(1, parseInt(card.querySelector(".pm-model-cantidad").value) || 1);
-    const prioridad = card.querySelector(".pm-model-prioridad").checked;
-    return {nombre, cantidad, prioridad};
-  });
+    return {
+      nombre: card.querySelector(".pm-analysis-check b").textContent,
+      cantidad: Math.max(1, parseInt(card.querySelector(".pm-model-cantidad").value) || 1),
+      prioridadNumero: index + 1
+    };
+  }).filter(Boolean);
 
-  const prioridad = datos.find(x => x.prioridad);
-  const resumenModelos = datos.map(x => `<strong>${pmEsc(x.nombre)}</strong> × ${x.cantidad}`).join(" · ");
-  resumen.innerHTML = `📋 ${resumenModelos}${prioridad ? ` &nbsp;|&nbsp; ⭐ Primero: <strong>${pmEsc(prioridad.nombre)}</strong>` : ""}`;
+  const resumenModelos = datos.map(x => `<strong>#${x.prioridadNumero} ${pmEsc(x.nombre)}</strong> × ${x.cantidad}`).join(" · ");
+  resumen.innerHTML = `📋 ${resumenModelos}<span style="margin-left:8px;color:#64748b">(la madera se distribuirá en ese orden)</span>`;
 }
 
 function pmActualizarEstadoModeloAnalisis(checkbox) {
   const card = checkbox.closest(".pm-analysis-model");
   if (!card) return;
   const cantidad = card.querySelector(".pm-model-cantidad");
-  const prioridad = card.querySelector(".pm-model-prioridad");
+
   cantidad.disabled = !checkbox.checked;
-  prioridad.disabled = !checkbox.checked;
   card.classList.toggle("pm-analysis-selected", checkbox.checked);
-  if (checkbox.checked && !document.querySelector('.pm-model-prioridad:checked')) prioridad.checked = true;
-  if (!checkbox.checked && prioridad.checked) {
-    prioridad.checked = false;
-    const siguiente = document.querySelector('.pm-model-check:checked');
-    if (siguiente) siguiente.closest('.pm-analysis-model').querySelector('.pm-model-prioridad').checked = true;
+
+  const id = String(checkbox.dataset.id);
+  const indice = pmOrdenSeleccion.indexOf(id);
+
+  if (checkbox.checked) {
+    if (indice === -1) pmOrdenSeleccion.push(id);
+  } else if (indice !== -1) {
+    pmOrdenSeleccion.splice(indice, 1);
   }
+
+  pmRenumerarPrioridades();
   pmActualizarResumenSeleccion();
 }
 
 function pmObtenerModelosSeleccionados() {
-  return Array.from(document.querySelectorAll('.pm-model-check:checked')).map(ch => {
+  pmRenumerarPrioridades();
+  return pmOrdenSeleccion.map((id, index) => {
+    const ch = document.querySelector(`.pm-model-check[data-id="${CSS.escape(String(id))}"]`);
+    if (!ch || !ch.checked) return null;
     const card = ch.closest('.pm-analysis-model');
     return {
-      modelo: pmBuscarModelo(ch.dataset.id),
+      modelo: pmBuscarModelo(id),
       cantidad: Math.max(1, parseInt(card.querySelector('.pm-model-cantidad').value) || 1),
-      prioritario: card.querySelector('.pm-model-prioridad').checked
+      prioridadNumero: index + 1,
+      prioritario: index === 0
     };
-  }).filter(x => x.modelo);
+  }).filter(x => x && x.modelo);
 }
 
 function pmEditarModelo(id) {
@@ -757,10 +811,8 @@ function pmAnalizar() {
   const madera = pmLeerMaderaDisponible();
   if (!madera.length) return alert("Ingresa la madera disponible por grosor en el punto 3.");
 
-  const prioridad = seleccionados.find(x => x.prioritario);
-  const orden = prioridad
-    ? [prioridad, ...seleccionados.filter(x => String(x.modelo.id) !== String(prioridad.modelo.id))]
-    : seleccionados;
+  // La madera se distribuye exactamente en el orden en que se seleccionaron los modelos: 1, 2, 3...
+  const orden = seleccionados.slice().sort((a, b) => (a.prioridadNumero || 999999) - (b.prioridadNumero || 999999));
 
   let disponible = pmAgruparMadera(madera);
   const resultados = [];
@@ -822,7 +874,7 @@ function pmAnalizar() {
   let html = `
     <div class="pm-result-box pm-info">
       <b>Orden de distribución de la madera</b>
-      <div style="margin-top:5px">${resultados.map((r,i) => `${i+1}. <b>${pmEsc(r.modelo.nombre)}</b>${r.prioritario ? ' ⭐ Prioritario' : ''} — solicitado: ${r.cantidad}`).join('<br>')}</div>
+      <div style="margin-top:5px">${resultados.map((r,i) => `${r.prioridadNumero || (i+1)}. <b>${pmEsc(r.modelo.nombre)}</b> — solicitado: ${r.cantidad}`).join('<br>')}</div>
     </div>`;
 
   resultados.forEach(r => {
@@ -832,7 +884,7 @@ function pmAnalizar() {
     html += `
       <div class="pm-result-box ${completo ? 'pm-ok' : 'pm-warn'}">
         <div style="font-size:17px;font-weight:800">
-          ${completo ? '✅' : '⚠️'} ${pmEsc(r.modelo.nombre)} ${r.prioritario ? '⭐' : ''}
+          ${completo ? '✅' : '⚠️'} ${pmEsc(r.modelo.nombre)} <span style="font-size:12px;color:#92400e">Prioridad ${r.prioridadNumero || ''}</span>
           ${completo
             ? '<span class="pm-complete-badge">COMPLETO</span>'
             : '<span class="pm-incomplete-badge">MADERA INSUFICIENTE</span>'}
@@ -2872,21 +2924,23 @@ let inputmedidas = document.getElementById('ing-medidas'); // Asegúrate de que 
   .pm-search-wrap input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.10)}
   .pm-selection-help{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 1px 12px;padding:9px 11px;background:#eff6ff;border:1px solid #dbeafe;border-radius:9px;color:#475569;font-size:11px}
   .pm-selection-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-height:390px;overflow:auto;padding:2px}
-  .pm-selection-list .pm-analysis-model{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;transition:.15s ease}
+  .pm-selection-list .pm-analysis-model{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:stretch;padding:13px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;transition:.15s ease;min-width:0}
   .pm-selection-list .pm-analysis-model:hover{border-color:#93c5fd;box-shadow:0 3px 10px rgba(15,23,42,.06)}
-  .pm-selection-list .pm-analysis-model.pm-analysis-selected{border-color:#2563eb;background:#f8fbff;box-shadow:0 0 0 2px rgba(37,99,235,.08)}
-  .pm-analysis-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-width:0}
-  .pm-analysis-check input{width:18px;height:18px;margin:2px 0 0;accent-color:#2563eb;cursor:pointer;flex:0 0 auto}
-  .pm-analysis-check>span{min-width:0}
-  .pm-analysis-check b{display:block;color:#0f172a;font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pm-selection-list .pm-analysis-model.pm-analysis-selected{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 2px rgba(37,99,235,.10)}
+  .pm-analysis-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-width:0;width:100%;padding:2px 2px 9px;border-bottom:1px solid #e5e7eb}
+  .pm-analysis-check input{width:19px;height:19px;margin:1px 0 0;accent-color:#2563eb;cursor:pointer;flex:0 0 auto}
+  .pm-analysis-check>span{min-width:0;flex:1}
+  .pm-analysis-check b{display:block;color:#0f172a;font-size:13px;line-height:1.35;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word}
+  .pm-analysis-selected .pm-analysis-check b{color:#1d4ed8}
   .pm-analysis-check small{display:block;color:#64748b;font-size:10px;margin-top:4px}
-  .pm-analysis-controls{display:flex;align-items:center;gap:8px}
-  .pm-analysis-controls>label:first-child{display:flex;flex-direction:column;gap:4px;color:#475569;font-size:10px;font-weight:700}
-  .pm-model-cantidad{width:70px;padding:7px 8px;border:1px solid #cbd5e1;border-radius:7px;text-align:center;font-weight:700;background:#fff}
+  .pm-analysis-controls{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;width:100%;padding:1px 2px 0}
+  .pm-analysis-controls>label:first-child{display:flex;flex-direction:row;align-items:center;gap:6px;color:#475569;font-size:11px;font-weight:700;margin:0}
+  .pm-model-cantidad{width:74px;padding:7px 8px;border:1px solid #cbd5e1;border-radius:7px;text-align:center;font-weight:700;background:#fff}
   .pm-model-cantidad:disabled{background:#f1f5f9;color:#94a3b8}
-  .pm-prioridad-label{display:flex!important;align-items:center;gap:4px!important;white-space:nowrap;color:#475569!important;font-size:10px!important;font-weight:700}
-  .pm-model-prioridad{width:17px;height:17px;accent-color:#f59e0b;cursor:pointer}
-  .pm-model-prioridad:disabled{cursor:not-allowed}
+  .pm-prioridad-label{display:flex!important;align-items:center;gap:6px!important;white-space:nowrap;color:#475569!important;font-size:11px!important;font-weight:700;margin:0!important}
+  .pm-model-prioridad{display:inline-flex;align-items:center;justify-content:center;min-width:27px;height:27px;padding:0 7px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-size:12px;font-weight:900}
+  .pm-analysis-model:not(.pm-analysis-selected) .pm-model-prioridad{background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0}
+  @media(max-width:520px){.pm-analysis-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pm-analysis-controls>label:first-child{justify-content:space-between}.pm-prioridad-label{justify-content:space-between}}
   .pm-selection-summary{margin-top:11px;min-height:38px;display:flex;align-items:center;padding:9px 12px;border-radius:9px;background:#f8fafc;border:1px dashed #cbd5e1;color:#475569;font-size:11px}
   .pm-selection-summary strong{color:#0f172a}
   .pm-selection-empty{grid-column:1/-1;padding:24px;text-align:center;border:1px dashed #cbd5e1;border-radius:10px;color:#64748b;background:#f8fafc}
@@ -3007,8 +3061,10 @@ const CONFIG_PLANIFICADOR_MADERA = {
   URL_APPS_SCRIPT: "REEMPLAZA_AQUI_URL_APPS_SCRIPT_MODELOS"
 };
 
-let pmModeloEditandoId = null;
-let pmModelosCache = [];
+var pmModeloEditandoId = null;
+var pmModelosCache = [];
+var pmOrdenSeleccion = window.pmOrdenSeleccion || [];
+window.pmOrdenSeleccion = pmOrdenSeleccion;
 
 function pmProcesarFraccion(valor) {
   if (valor === null || valor === undefined) return 0;
@@ -3195,6 +3251,9 @@ function pmRenderSeleccionModelos() {
   const buscar = document.getElementById("pm-buscar-modelos");
   if (buscar) buscar.value = "";
 
+  pmOrdenSeleccion = [];
+  window.pmOrdenSeleccion = pmOrdenSeleccion;
+
   if (!pmModelosCache.length) {
     cont.innerHTML = '<div class="pm-selection-empty">No hay modelos guardados.<br><small>Crea primero un modelo en el punto 1.</small></div>';
     pmActualizarResumenSeleccion();
@@ -3202,7 +3261,7 @@ function pmRenderSeleccionModelos() {
   }
 
   cont.innerHTML = pmModelosCache.map(m => `
-    <div class="pm-analysis-model" data-model-id="${pmEsc(m.id)}" data-model-name="${pmEsc((m.nombre || "").toLowerCase())}">
+    <div class="pm-analysis-model" data-model-id="${pmEsc(m.id)}" data-model-name="${pmEsc((m.nombre || "").toLowerCase())}" data-priority="">
       <label class="pm-analysis-check">
         <input type="checkbox" class="pm-model-check" data-id="${pmEsc(m.id)}" onchange="pmActualizarEstadoModeloAnalisis(this)">
         <span>
@@ -3214,9 +3273,9 @@ function pmRenderSeleccionModelos() {
         <label>Cantidad
           <input type="number" class="pm-model-cantidad" data-id="${pmEsc(m.id)}" min="1" step="1" value="1" disabled oninput="pmActualizarResumenSeleccion()">
         </label>
-        <label class="pm-prioridad-label" title="Este modelo consumirá primero la madera disponible">
-          ⭐ Prioritario
-          <input type="radio" name="pm-prioridad" class="pm-model-prioridad" data-id="${pmEsc(m.id)}" disabled onchange="pmActualizarResumenSeleccion()">
+        <label class="pm-prioridad-label" title="Orden en que se distribuirá la madera a los modelos seleccionados">
+          Prioridad
+          <span class="pm-model-prioridad" data-id="${pmEsc(m.id)}">—</span>
         </label>
       </div>
     </div>
@@ -3268,10 +3327,30 @@ function pmLimpiarSeleccionModelos() {
     check.checked = false;
     pmActualizarEstadoModeloAnalisis(check);
   });
+  pmOrdenSeleccion = [];
+  window.pmOrdenSeleccion = pmOrdenSeleccion;
   pmActualizarResumenSeleccion();
 }
 
+function pmRenumerarPrioridades() {
+  const seleccionados = pmOrdenSeleccion.filter(id => {
+    const ch = document.querySelector(`.pm-model-check[data-id="${CSS.escape(String(id))}"]`);
+    return ch && ch.checked;
+  });
+  pmOrdenSeleccion = seleccionados;
+  window.pmOrdenSeleccion = pmOrdenSeleccion;
+
+  document.querySelectorAll(".pm-analysis-model").forEach(card => {
+    const id = String(card.dataset.modelId);
+    const pos = pmOrdenSeleccion.indexOf(id);
+    const badge = card.querySelector(".pm-model-prioridad");
+    card.dataset.priority = pos >= 0 ? String(pos + 1) : "";
+    if (badge) badge.textContent = pos >= 0 ? String(pos + 1) : "—";
+  });
+}
+
 function pmActualizarResumenSeleccion() {
+  pmRenumerarPrioridades();
   const checks = Array.from(document.querySelectorAll(".pm-model-check:checked"));
   const contador = document.getElementById("pm-seleccion-contador");
   const resumen = document.getElementById("pm-seleccion-resumen");
@@ -3284,46 +3363,55 @@ function pmActualizarResumenSeleccion() {
     return;
   }
 
-  const datos = checks.map(ch => {
+  const datos = pmOrdenSeleccion.map((id, index) => {
+    const ch = document.querySelector(`.pm-model-check[data-id="${CSS.escape(String(id))}"]`);
+    if (!ch || !ch.checked) return null;
     const card = ch.closest(".pm-analysis-model");
-    const nombre = card.querySelector(".pm-analysis-check b").textContent;
-    const cantidad = Math.max(1, parseInt(card.querySelector(".pm-model-cantidad").value) || 1);
-    const prioridad = card.querySelector(".pm-model-prioridad").checked;
-    return {nombre, cantidad, prioridad};
-  });
+    return {
+      nombre: card.querySelector(".pm-analysis-check b").textContent,
+      cantidad: Math.max(1, parseInt(card.querySelector(".pm-model-cantidad").value) || 1),
+      prioridadNumero: index + 1
+    };
+  }).filter(Boolean);
 
-  const prioridad = datos.find(x => x.prioridad);
-  const resumenModelos = datos.map(x => `<strong>${pmEsc(x.nombre)}</strong> × ${x.cantidad}`).join(" · ");
-  resumen.innerHTML = `📋 ${resumenModelos}${prioridad ? ` &nbsp;|&nbsp; ⭐ Primero: <strong>${pmEsc(prioridad.nombre)}</strong>` : ""}`;
+  const resumenModelos = datos.map(x => `<strong>#${x.prioridadNumero} ${pmEsc(x.nombre)}</strong> × ${x.cantidad}`).join(" · ");
+  resumen.innerHTML = `📋 ${resumenModelos}<span style="margin-left:8px;color:#64748b">(la madera se distribuirá en ese orden)</span>`;
 }
 
 function pmActualizarEstadoModeloAnalisis(checkbox) {
-  const id = checkbox.dataset.id;
-  const card = document.querySelector(`.pm-analysis-model[data-model-id="${CSS.escape(id)}"]`);
+  const card = checkbox.closest(".pm-analysis-model");
   if (!card) return;
   const cantidad = card.querySelector(".pm-model-cantidad");
-  const prioridad = card.querySelector(".pm-model-prioridad");
+
   cantidad.disabled = !checkbox.checked;
-  prioridad.disabled = !checkbox.checked;
   card.classList.toggle("pm-analysis-selected", checkbox.checked);
-  if (checkbox.checked && !document.querySelector('.pm-model-prioridad:checked')) prioridad.checked = true;
-  if (!checkbox.checked && prioridad.checked) {
-    prioridad.checked = false;
-    const siguiente = document.querySelector('.pm-model-check:checked');
-    if (siguiente) siguiente.closest('.pm-analysis-model').querySelector('.pm-model-prioridad').checked = true;
+
+  const id = String(checkbox.dataset.id);
+  const indice = pmOrdenSeleccion.indexOf(id);
+
+  if (checkbox.checked) {
+    if (indice === -1) pmOrdenSeleccion.push(id);
+  } else if (indice !== -1) {
+    pmOrdenSeleccion.splice(indice, 1);
   }
+
+  pmRenumerarPrioridades();
   pmActualizarResumenSeleccion();
 }
 
 function pmObtenerModelosSeleccionados() {
-  return Array.from(document.querySelectorAll('.pm-model-check:checked')).map(ch => {
+  pmRenumerarPrioridades();
+  return pmOrdenSeleccion.map((id, index) => {
+    const ch = document.querySelector(`.pm-model-check[data-id="${CSS.escape(String(id))}"]`);
+    if (!ch || !ch.checked) return null;
     const card = ch.closest('.pm-analysis-model');
     return {
-      modelo: pmBuscarModelo(ch.dataset.id),
+      modelo: pmBuscarModelo(id),
       cantidad: Math.max(1, parseInt(card.querySelector('.pm-model-cantidad').value) || 1),
-      prioritario: card.querySelector('.pm-model-prioridad').checked
+      prioridadNumero: index + 1,
+      prioritario: index === 0
     };
-  }).filter(x => x.modelo);
+  }).filter(x => x && x.modelo);
 }
 
 function pmEditarModelo(id) {
@@ -3400,10 +3488,8 @@ function pmAnalizar() {
   const madera = pmLeerMaderaDisponible();
   if (!madera.length) return alert("Ingresa la madera disponible por grosor en el punto 3.");
 
-  const prioridad = seleccionados.find(x => x.prioritario);
-  const orden = prioridad
-    ? [prioridad, ...seleccionados.filter(x => String(x.modelo.id) !== String(prioridad.modelo.id))]
-    : seleccionados;
+  // La madera se distribuye exactamente en el orden en que se seleccionaron los modelos: 1, 2, 3...
+  const orden = seleccionados.slice().sort((a, b) => (a.prioridadNumero || 999999) - (b.prioridadNumero || 999999));
 
   let disponible = pmAgruparMadera(madera);
   const resultados = [];
@@ -3437,14 +3523,14 @@ function pmAnalizar() {
   let html = `
     <div class="pm-result-box pm-info">
       <b>Orden de distribución de la madera</b>
-      <div style="margin-top:5px">${resultados.map((r,i) => `${i+1}. <b>${pmEsc(r.modelo.nombre)}</b>${r.prioritario ? ' ⭐ Prioritario' : ''} — solicitado: ${r.cantidad}`).join('<br>')}</div>
+      <div style="margin-top:5px">${resultados.map((r,i) => `${r.prioridadNumero || (i+1)}. <b>${pmEsc(r.modelo.nombre)}</b> — solicitado: ${r.cantidad}`).join('<br>')}</div>
     </div>`;
 
   resultados.forEach(r => {
     const completo = r.fabricables >= r.cantidad;
     html += `
       <div class="pm-result-box ${completo ? 'pm-ok' : 'pm-warn'}">
-        <div style="font-size:17px;font-weight:800">${completo ? '✅' : '⚠️'} ${pmEsc(r.modelo.nombre)} ${r.prioritario ? '⭐' : ''}</div>
+        <div style="font-size:17px;font-weight:800">${completo ? '✅' : '⚠️'} ${pmEsc(r.modelo.nombre)} <span style="font-size:12px;color:#92400e">Prioridad ${r.prioridadNumero || ''}</span></div>
         <div style="margin-top:5px">Solicitadas: <b>${r.cantidad}</b> · Se pueden fabricar: <b>${r.fabricables}</b></div>
         <div style="margin-top:8px">Madera restante después de este modelo:</div>
         <table class="pm-results" style="margin-top:6px">
@@ -5392,21 +5478,23 @@ let inputmedidas = document.getElementById('ing-medidas'); // Asegúrate de que 
   .pm-search-wrap input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.10)}
   .pm-selection-help{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 1px 12px;padding:9px 11px;background:#eff6ff;border:1px solid #dbeafe;border-radius:9px;color:#475569;font-size:11px}
   .pm-selection-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-height:390px;overflow:auto;padding:2px}
-  .pm-selection-list .pm-analysis-model{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;transition:.15s ease}
+  .pm-selection-list .pm-analysis-model{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:stretch;padding:13px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;transition:.15s ease;min-width:0}
   .pm-selection-list .pm-analysis-model:hover{border-color:#93c5fd;box-shadow:0 3px 10px rgba(15,23,42,.06)}
-  .pm-selection-list .pm-analysis-model.pm-analysis-selected{border-color:#2563eb;background:#f8fbff;box-shadow:0 0 0 2px rgba(37,99,235,.08)}
-  .pm-analysis-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-width:0}
-  .pm-analysis-check input{width:18px;height:18px;margin:2px 0 0;accent-color:#2563eb;cursor:pointer;flex:0 0 auto}
-  .pm-analysis-check>span{min-width:0}
-  .pm-analysis-check b{display:block;color:#0f172a;font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pm-selection-list .pm-analysis-model.pm-analysis-selected{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 2px rgba(37,99,235,.10)}
+  .pm-analysis-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-width:0;width:100%;padding:2px 2px 9px;border-bottom:1px solid #e5e7eb}
+  .pm-analysis-check input{width:19px;height:19px;margin:1px 0 0;accent-color:#2563eb;cursor:pointer;flex:0 0 auto}
+  .pm-analysis-check>span{min-width:0;flex:1}
+  .pm-analysis-check b{display:block;color:#0f172a;font-size:13px;line-height:1.35;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word}
+  .pm-analysis-selected .pm-analysis-check b{color:#1d4ed8}
   .pm-analysis-check small{display:block;color:#64748b;font-size:10px;margin-top:4px}
-  .pm-analysis-controls{display:flex;align-items:center;gap:8px}
-  .pm-analysis-controls>label:first-child{display:flex;flex-direction:column;gap:4px;color:#475569;font-size:10px;font-weight:700}
-  .pm-model-cantidad{width:70px;padding:7px 8px;border:1px solid #cbd5e1;border-radius:7px;text-align:center;font-weight:700;background:#fff}
+  .pm-analysis-controls{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;width:100%;padding:1px 2px 0}
+  .pm-analysis-controls>label:first-child{display:flex;flex-direction:row;align-items:center;gap:6px;color:#475569;font-size:11px;font-weight:700;margin:0}
+  .pm-model-cantidad{width:74px;padding:7px 8px;border:1px solid #cbd5e1;border-radius:7px;text-align:center;font-weight:700;background:#fff}
   .pm-model-cantidad:disabled{background:#f1f5f9;color:#94a3b8}
-  .pm-prioridad-label{display:flex!important;align-items:center;gap:4px!important;white-space:nowrap;color:#475569!important;font-size:10px!important;font-weight:700}
-  .pm-model-prioridad{width:17px;height:17px;accent-color:#f59e0b;cursor:pointer}
-  .pm-model-prioridad:disabled{cursor:not-allowed}
+  .pm-prioridad-label{display:flex!important;align-items:center;gap:6px!important;white-space:nowrap;color:#475569!important;font-size:11px!important;font-weight:700;margin:0!important}
+  .pm-model-prioridad{display:inline-flex;align-items:center;justify-content:center;min-width:27px;height:27px;padding:0 7px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-size:12px;font-weight:900}
+  .pm-analysis-model:not(.pm-analysis-selected) .pm-model-prioridad{background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0}
+  @media(max-width:520px){.pm-analysis-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pm-analysis-controls>label:first-child{justify-content:space-between}.pm-prioridad-label{justify-content:space-between}}
   .pm-selection-summary{margin-top:11px;min-height:38px;display:flex;align-items:center;padding:9px 12px;border-radius:9px;background:#f8fafc;border:1px dashed #cbd5e1;color:#475569;font-size:11px}
   .pm-selection-summary strong{color:#0f172a}
   .pm-selection-empty{grid-column:1/-1;padding:24px;text-align:center;border:1px dashed #cbd5e1;border-radius:10px;color:#64748b;background:#f8fafc}
@@ -5527,8 +5615,10 @@ const CONFIG_PLANIFICADOR_MADERA = {
   URL_APPS_SCRIPT: "REEMPLAZA_AQUI_URL_APPS_SCRIPT_MODELOS"
 };
 
-let pmModeloEditandoId = null;
-let pmModelosCache = [];
+var pmModeloEditandoId = null;
+var pmModelosCache = [];
+var pmOrdenSeleccion = window.pmOrdenSeleccion || [];
+window.pmOrdenSeleccion = pmOrdenSeleccion;
 
 function pmProcesarFraccion(valor) {
   if (valor === null || valor === undefined) return 0;
@@ -5715,6 +5805,9 @@ function pmRenderSeleccionModelos() {
   const buscar = document.getElementById("pm-buscar-modelos");
   if (buscar) buscar.value = "";
 
+  pmOrdenSeleccion = [];
+  window.pmOrdenSeleccion = pmOrdenSeleccion;
+
   if (!pmModelosCache.length) {
     cont.innerHTML = '<div class="pm-selection-empty">No hay modelos guardados.<br><small>Crea primero un modelo en el punto 1.</small></div>';
     pmActualizarResumenSeleccion();
@@ -5722,7 +5815,7 @@ function pmRenderSeleccionModelos() {
   }
 
   cont.innerHTML = pmModelosCache.map(m => `
-    <div class="pm-analysis-model" data-model-id="${pmEsc(m.id)}" data-model-name="${pmEsc((m.nombre || "").toLowerCase())}">
+    <div class="pm-analysis-model" data-model-id="${pmEsc(m.id)}" data-model-name="${pmEsc((m.nombre || "").toLowerCase())}" data-priority="">
       <label class="pm-analysis-check">
         <input type="checkbox" class="pm-model-check" data-id="${pmEsc(m.id)}" onchange="pmActualizarEstadoModeloAnalisis(this)">
         <span>
@@ -5734,9 +5827,9 @@ function pmRenderSeleccionModelos() {
         <label>Cantidad
           <input type="number" class="pm-model-cantidad" data-id="${pmEsc(m.id)}" min="1" step="1" value="1" disabled oninput="pmActualizarResumenSeleccion()">
         </label>
-        <label class="pm-prioridad-label" title="Este modelo consumirá primero la madera disponible">
-          ⭐ Prioritario
-          <input type="radio" name="pm-prioridad" class="pm-model-prioridad" data-id="${pmEsc(m.id)}" disabled onchange="pmActualizarResumenSeleccion()">
+        <label class="pm-prioridad-label" title="Orden en que se distribuirá la madera a los modelos seleccionados">
+          Prioridad
+          <span class="pm-model-prioridad" data-id="${pmEsc(m.id)}">—</span>
         </label>
       </div>
     </div>
@@ -5788,10 +5881,30 @@ function pmLimpiarSeleccionModelos() {
     check.checked = false;
     pmActualizarEstadoModeloAnalisis(check);
   });
+  pmOrdenSeleccion = [];
+  window.pmOrdenSeleccion = pmOrdenSeleccion;
   pmActualizarResumenSeleccion();
 }
 
+function pmRenumerarPrioridades() {
+  const seleccionados = pmOrdenSeleccion.filter(id => {
+    const ch = document.querySelector(`.pm-model-check[data-id="${CSS.escape(String(id))}"]`);
+    return ch && ch.checked;
+  });
+  pmOrdenSeleccion = seleccionados;
+  window.pmOrdenSeleccion = pmOrdenSeleccion;
+
+  document.querySelectorAll(".pm-analysis-model").forEach(card => {
+    const id = String(card.dataset.modelId);
+    const pos = pmOrdenSeleccion.indexOf(id);
+    const badge = card.querySelector(".pm-model-prioridad");
+    card.dataset.priority = pos >= 0 ? String(pos + 1) : "";
+    if (badge) badge.textContent = pos >= 0 ? String(pos + 1) : "—";
+  });
+}
+
 function pmActualizarResumenSeleccion() {
+  pmRenumerarPrioridades();
   const checks = Array.from(document.querySelectorAll(".pm-model-check:checked"));
   const contador = document.getElementById("pm-seleccion-contador");
   const resumen = document.getElementById("pm-seleccion-resumen");
@@ -5804,46 +5917,55 @@ function pmActualizarResumenSeleccion() {
     return;
   }
 
-  const datos = checks.map(ch => {
+  const datos = pmOrdenSeleccion.map((id, index) => {
+    const ch = document.querySelector(`.pm-model-check[data-id="${CSS.escape(String(id))}"]`);
+    if (!ch || !ch.checked) return null;
     const card = ch.closest(".pm-analysis-model");
-    const nombre = card.querySelector(".pm-analysis-check b").textContent;
-    const cantidad = Math.max(1, parseInt(card.querySelector(".pm-model-cantidad").value) || 1);
-    const prioridad = card.querySelector(".pm-model-prioridad").checked;
-    return {nombre, cantidad, prioridad};
-  });
+    return {
+      nombre: card.querySelector(".pm-analysis-check b").textContent,
+      cantidad: Math.max(1, parseInt(card.querySelector(".pm-model-cantidad").value) || 1),
+      prioridadNumero: index + 1
+    };
+  }).filter(Boolean);
 
-  const prioridad = datos.find(x => x.prioridad);
-  const resumenModelos = datos.map(x => `<strong>${pmEsc(x.nombre)}</strong> × ${x.cantidad}`).join(" · ");
-  resumen.innerHTML = `📋 ${resumenModelos}${prioridad ? ` &nbsp;|&nbsp; ⭐ Primero: <strong>${pmEsc(prioridad.nombre)}</strong>` : ""}`;
+  const resumenModelos = datos.map(x => `<strong>#${x.prioridadNumero} ${pmEsc(x.nombre)}</strong> × ${x.cantidad}`).join(" · ");
+  resumen.innerHTML = `📋 ${resumenModelos}<span style="margin-left:8px;color:#64748b">(la madera se distribuirá en ese orden)</span>`;
 }
 
 function pmActualizarEstadoModeloAnalisis(checkbox) {
-  const id = checkbox.dataset.id;
-  const card = document.querySelector(`.pm-analysis-model[data-model-id="${CSS.escape(id)}"]`);
+  const card = checkbox.closest(".pm-analysis-model");
   if (!card) return;
   const cantidad = card.querySelector(".pm-model-cantidad");
-  const prioridad = card.querySelector(".pm-model-prioridad");
+
   cantidad.disabled = !checkbox.checked;
-  prioridad.disabled = !checkbox.checked;
   card.classList.toggle("pm-analysis-selected", checkbox.checked);
-  if (checkbox.checked && !document.querySelector('.pm-model-prioridad:checked')) prioridad.checked = true;
-  if (!checkbox.checked && prioridad.checked) {
-    prioridad.checked = false;
-    const siguiente = document.querySelector('.pm-model-check:checked');
-    if (siguiente) siguiente.closest('.pm-analysis-model').querySelector('.pm-model-prioridad').checked = true;
+
+  const id = String(checkbox.dataset.id);
+  const indice = pmOrdenSeleccion.indexOf(id);
+
+  if (checkbox.checked) {
+    if (indice === -1) pmOrdenSeleccion.push(id);
+  } else if (indice !== -1) {
+    pmOrdenSeleccion.splice(indice, 1);
   }
+
+  pmRenumerarPrioridades();
   pmActualizarResumenSeleccion();
 }
 
 function pmObtenerModelosSeleccionados() {
-  return Array.from(document.querySelectorAll('.pm-model-check:checked')).map(ch => {
+  pmRenumerarPrioridades();
+  return pmOrdenSeleccion.map((id, index) => {
+    const ch = document.querySelector(`.pm-model-check[data-id="${CSS.escape(String(id))}"]`);
+    if (!ch || !ch.checked) return null;
     const card = ch.closest('.pm-analysis-model');
     return {
-      modelo: pmBuscarModelo(ch.dataset.id),
+      modelo: pmBuscarModelo(id),
       cantidad: Math.max(1, parseInt(card.querySelector('.pm-model-cantidad').value) || 1),
-      prioritario: card.querySelector('.pm-model-prioridad').checked
+      prioridadNumero: index + 1,
+      prioritario: index === 0
     };
-  }).filter(x => x.modelo);
+  }).filter(x => x && x.modelo);
 }
 
 function pmEditarModelo(id) {
@@ -5920,10 +6042,8 @@ function pmAnalizar() {
   const madera = pmLeerMaderaDisponible();
   if (!madera.length) return alert("Ingresa la madera disponible por grosor en el punto 3.");
 
-  const prioridad = seleccionados.find(x => x.prioritario);
-  const orden = prioridad
-    ? [prioridad, ...seleccionados.filter(x => String(x.modelo.id) !== String(prioridad.modelo.id))]
-    : seleccionados;
+  // La madera se distribuye exactamente en el orden en que se seleccionaron los modelos: 1, 2, 3...
+  const orden = seleccionados.slice().sort((a, b) => (a.prioridadNumero || 999999) - (b.prioridadNumero || 999999));
 
   let disponible = pmAgruparMadera(madera);
   const resultados = [];
@@ -5957,14 +6077,14 @@ function pmAnalizar() {
   let html = `
     <div class="pm-result-box pm-info">
       <b>Orden de distribución de la madera</b>
-      <div style="margin-top:5px">${resultados.map((r,i) => `${i+1}. <b>${pmEsc(r.modelo.nombre)}</b>${r.prioritario ? ' ⭐ Prioritario' : ''} — solicitado: ${r.cantidad}`).join('<br>')}</div>
+      <div style="margin-top:5px">${resultados.map((r,i) => `${r.prioridadNumero || (i+1)}. <b>${pmEsc(r.modelo.nombre)}</b> — solicitado: ${r.cantidad}`).join('<br>')}</div>
     </div>`;
 
   resultados.forEach(r => {
     const completo = r.fabricables >= r.cantidad;
     html += `
       <div class="pm-result-box ${completo ? 'pm-ok' : 'pm-warn'}">
-        <div style="font-size:17px;font-weight:800">${completo ? '✅' : '⚠️'} ${pmEsc(r.modelo.nombre)} ${r.prioritario ? '⭐' : ''}</div>
+        <div style="font-size:17px;font-weight:800">${completo ? '✅' : '⚠️'} ${pmEsc(r.modelo.nombre)} <span style="font-size:12px;color:#92400e">Prioridad ${r.prioridadNumero || ''}</span></div>
         <div style="margin-top:5px">Solicitadas: <b>${r.cantidad}</b> · Se pueden fabricar: <b>${r.fabricables}</b></div>
         <div style="margin-top:8px">Madera restante después de este modelo:</div>
         <table class="pm-results" style="margin-top:6px">
@@ -7693,3 +7813,4 @@ let inputmedidas = document.getElementById('ing-medidas'); // Asegúrate de que 
     
 </body>
 </html>
+
